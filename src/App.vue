@@ -23,4 +23,7 @@ body{
   padding: 0;
   margin: 0;
 }
+.van-image{
+  overflow: hidden;
+}
 </style>

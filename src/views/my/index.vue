@@ -18,8 +18,8 @@
   </div>
 
   <van-cell-group>
-  <van-cell icon="location-o" title="单元格" is-link value="内容" />
-  <van-cell icon="location-o" title="单元格" is-link value="内容" />
+  <van-cell icon="location-o" title="代理商管理" is-link  />
+  <van-cell icon="location-o" title="商品管理" is-link />
 </van-cell-group>
 
 
