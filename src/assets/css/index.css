@@ -1,0 +1,14 @@
+.order-edit {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 15px 20px;
+    box-sizing: border-box;
+  }
+  
+  .place_text {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }

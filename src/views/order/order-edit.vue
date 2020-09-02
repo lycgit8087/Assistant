@@ -8,31 +8,25 @@
         <span>地址智能识别</span>
         <p>自动识别</p>
       </div>
-        <div class="borderView" >
-             <van-field
-        v-model="message"
-        rows="3"
-        autosize
-        :border="false"
-        type="textarea"
-        placeholder="复制文字自动识别，如：陈靖如  18578784506  广州市天河区育新街89号天佑小区5栋301"
-      />
-        </div>
-     
-
+      <div class="borderView">
+        <van-field
+          v-model="message"
+          rows="3"
+          autosize
+          :border="false"
+          type="textarea"
+          placeholder="复制文字自动识别，如：陈靖如  18578784506  广州市天河区育新街89号天佑小区5栋301"
+        />
+      </div>
 
       <!-- 商品名称 -->
-      <div class="edit_title" >
-          <span>商品名称</span>
+      <div class="edit_title">
+        <span>商品名称</span>
       </div>
-      <div class="borderView" >
-           <van-field
-    v-model="username"
-    :border="false"
-    placeholder="请输入用户名"
-  />
+      <div class="borderView">
+        <van-field v-model="username" :border="false" placeholder="请输入用户名" />
       </div>
-      
+
       <div style="margin: 16px;">
         <van-button round block type="info" native-type="submit">提交订单</van-button>
       </div>
@@ -48,8 +42,10 @@ export default {
       value1: "",
       pattern: /\d{6}/,
       message: "",
-      username:""
-    };
+      username: "",
+      red_icon: "",
+      
+    }
   },
   methods: {
     formatDate(date) {
@@ -103,7 +99,7 @@ html {
   font-weight: 400;
   color: #ffffff;
 }
-.borderView{
-    border: 1px solid #E9E9E9;
+.borderView {
+  border: 1px solid #e9e9e9;
 }
 </style>
