@@ -21,11 +21,66 @@
 
       <!-- 商品名称 -->
       <div class="edit_title">
+        <van-image fit="cover" :src="red_icon" />
         <span>商品名称</span>
       </div>
       <div class="borderView">
-        <van-field v-model="username" :border="false" placeholder="请输入用户名" />
+        <van-field v-model="username" :border="false" placeholder="请输入商品名称规格等信息" />
       </div>
+
+      <!-- 收件人 -->
+      <div class="edit_title">
+        <van-image fit="cover" :src="red_icon" />
+        <span>收件人</span>
+      </div>
+      <div class="borderView">
+        <van-field v-model="username" :border="false" placeholder="请输入收件人名字" />
+      </div>
+
+      <!-- 收件人 -->
+      <div class="edit_title">
+        <van-image fit="cover" :src="red_icon" />
+        <span>联系方式</span>
+      </div>
+      <div class="borderView">
+        <van-field v-model="username" :border="false" placeholder="请输入联系方式" />
+      </div>
+
+      <!-- 收件人 -->
+      <div class="edit_title">
+        <van-image fit="cover" :src="red_icon" />
+        <span>收货地址</span>
+      </div>
+
+      <div class="borderView">
+        <van-field readonly clickable name="area" :value="areaValue"  placeholder="点击选择省市区" @click="showArea = true" :border="false"  />
+      </div>
+
+      <!-- 详细地址 -->
+      <div class="borderView mt10">
+        <van-field v-model="username" :border="false" placeholder="详细地址" />
+      </div>
+
+      <!-- 收件人 -->
+      <div class="edit_title">
+        <span>订单备注</span>
+      </div>
+
+       <div class="borderView">
+        <van-field
+          v-model="message"
+          rows="3"
+          autosize
+          :border="false"
+          type="textarea"
+          placeholder="请输入订单备注信息（选填）"
+        />
+      </div>
+
+      
+      <van-popup v-model="showArea" position="bottom">
+        <van-area :area-list="areaList" @confirm="onConfirm" @cancel="showArea = false" />
+      </van-popup>
 
       <div style="margin: 16px;">
         <van-button round block type="info" native-type="submit">提交订单</van-button>
@@ -35,17 +90,21 @@
 </template>
 
 <script>
+  import AreaList from  "../../assets/js/area"
+  
 export default {
   name: "order-edit",
   data() {
     return {
       value1: "",
       pattern: /\d{6}/,
+      areaValue:"",
       message: "",
       username: "",
-      red_icon: "",
-      
-    }
+      red_icon: require("../../assets/images/required.png"),
+      showArea:false,
+      areaList: AreaList,
+    };
   },
   methods: {
     formatDate(date) {
@@ -55,6 +114,11 @@ export default {
     popupToggle() {
       let { popupShow } = this;
       this.popupShow = !popupShow;
+    },
+     onConfirm(values) {
+       console.log(values)
+      this.areaValue = values.map((item) => item.name).join('/');
+      this.showArea = false;
     },
     onFailed() {},
   },
@@ -101,5 +165,19 @@ html {
 }
 .borderView {
   border: 1px solid #e9e9e9;
+}
+.edit_title {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 400;
+  color: #202020;
+   margin: 15px 0;
+}
+.edit_title .van-image {
+  width: 16px;
+  height: 16px;
+  margin-right: 5px;
+ 
 }
 </style>

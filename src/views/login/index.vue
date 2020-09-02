@@ -6,6 +6,16 @@
       <p class="loginViewTitle">
         <span>登录</span>
       </p>
+      <div class="identity" >
+        <div :class="identityNum==index?'active_boder':''" @click="chnageIdentity(index)" v-for="(item,index) in identity" :key="index" >
+        <van-image fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
+        <p>{{item.text}}</p>
+
+        </div>
+
+      </div>
+
+
       <van-field :maxlength="11" :rules="[{ validator, message: '请输入正确内容' }]" v-model="tel" type="tel" placeholder="请输入手机号码" />
       <van-divider />
       <van-field  v-model="sms" center clearable  placeholder="请输入短信验证码">
@@ -34,7 +44,13 @@ export default {
       value: "",
       tel: "",
       sms:"",
-      pattern:''
+      pattern:'',
+      identity:[
+        {text:"消费者",url:""},
+        {text:"代理商",url:""},
+        {text:"供应商",url:""},
+      ],
+      identityNum:0
     };
   },
   //监听属性 类似于data概念
@@ -46,6 +62,9 @@ export default {
       validator(val) {
           console.log(val)
       return /^[1][3,4,5,6,7,8,9][0-9]{9}$/.test(val);
+    },
+    chnageIdentity(index){
+      this.identityNum=index
     },
   },
   //生命周期 - 创建完成（可以访问当前this实例）
@@ -84,9 +103,40 @@ html {
   font-weight: 400;
   color: #28292e;
   margin-top: 60px;
-  margin-bottom: 80px;
+  margin-bottom: 40px;
 }
 .loginViewTitle > span {
   border-bottom: 9px solid #082a54;
+}
+.identity{
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  width: 100%;
+  margin-bottom: 50px;
+  box-sizing: border-box;
+}
+.identity>div{
+  width: 70px;
+height: 70px;
+background: #FFFFFF;
+box-shadow: 0px 5px 25px 1px rgba(55,58,64,0.14);
+border-radius: 5px;
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+font-size: 16px;
+color: #082A54;
+
+
+}
+.identity>div .van-image{
+  width: 30px;
+  height: 30px;
+  margin-bottom: 5px;
+}
+.active_boder{
+  border: 2px  solid #082A54;
 }
 </style>

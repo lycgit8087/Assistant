@@ -25,5 +25,9 @@ body{
 }
 .van-image{
   overflow: hidden;
+  }
+.mt10{
+  margin-top: 10px;
 }
+
 </style>
