@@ -9,8 +9,8 @@ import 'vant/lib/index.css';
 import 'amfe-flexible/index.js'
 import {post,fetch,patch,put,get_token,get_new_token} from './utils/request'
 import store from "./store"
-// Vue.prototype.$get_new_token=get_new_token
-// Vue.prototype.$post=post;
+Vue.prototype.$get_new_token=get_new_token
+Vue.prototype.$post=post;
 
 Vue.use(Vant);
 Vue.prototype.$axios=axios;

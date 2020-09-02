@@ -1,0 +1,109 @@
+<template>
+  <div class="order-edit">
+    <van-nav-bar title="下单链接" :fixed="true" placeholder />
+
+    <van-form validate-first @failed="onFailed">
+      <!-- 智能识别地址 -->
+      <div class="place_text">
+        <span>地址智能识别</span>
+        <p>自动识别</p>
+      </div>
+        <div class="borderView" >
+             <van-field
+        v-model="message"
+        rows="3"
+        autosize
+        :border="false"
+        type="textarea"
+        placeholder="复制文字自动识别，如：陈靖如  18578784506  广州市天河区育新街89号天佑小区5栋301"
+      />
+        </div>
+     
+
+
+      <!-- 商品名称 -->
+      <div class="edit_title" >
+          <span>商品名称</span>
+      </div>
+      <div class="borderView" >
+           <van-field
+    v-model="username"
+    :border="false"
+    placeholder="请输入用户名"
+  />
+      </div>
+      
+      <div style="margin: 16px;">
+        <van-button round block type="info" native-type="submit">提交订单</van-button>
+      </div>
+    </van-form>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "order-edit",
+  data() {
+    return {
+      value1: "",
+      pattern: /\d{6}/,
+      message: "",
+      username:""
+    };
+  },
+  methods: {
+    formatDate(date) {
+      return `${date.getMonth() + 1}/${date.getDate()}`;
+    },
+    onLoad() {},
+    popupToggle() {
+      let { popupShow } = this;
+      this.popupShow = !popupShow;
+    },
+    onFailed() {},
+  },
+};
+</script>
+
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style >
+/* @import url('../../assets/index.css'); */
+html {
+  background: #fff;
+}
+.order-edit {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 15px 20px;
+  box-sizing: border-box;
+}
+
+.place_text {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 17px;
+}
+.place_text > span {
+  font-size: 14px;
+  font-weight: 400;
+  color: #202020;
+}
+.place_text > p {
+  width: 64px;
+  height: 24px;
+  background: #e96960;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 400;
+  color: #ffffff;
+}
+.borderView{
+    border: 1px solid #E9E9E9;
+}
+</style>

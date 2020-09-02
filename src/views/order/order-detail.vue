@@ -30,10 +30,9 @@
     v-model="qrcode"
     clearable
     label="快递单号"
-    placeholder="快递单号""
+    placeholder="快递单号"
     right-icon="scan"
     />
-
     <!-- 物流信息 -->
     <van-steps direction="vertical" :active="0">
       <van-step>
@@ -67,7 +66,7 @@ export default {
       place: "",
       name: "",
       phone: "",
-      qrcode: ""
+      qrcode: "",
     };
   },
   //监听属性 类似于data概念
@@ -86,7 +85,7 @@ export default {
   updated() {}, //生命周期 - 更新之后
   beforeDestroy() {}, //生命周期 - 销毁之前
   destroyed() {}, //生命周期 - 销毁完成
-  activated() {} //如果页面有keep-alive缓存功能，这个函数会触发
+  activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
 };
 </script>
 <style  scoped>

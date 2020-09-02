@@ -7,6 +7,8 @@ import Order from '@/views/order'
 import OrderDetail from '@/views/order/order-detail'
 import Maillist from '@/views/my/mail-list'
 import Login from '@/views/login'
+import OrderEdit from '@/views/order/order-edit'
+
 
 
 
@@ -16,7 +18,7 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/',
+      path: '/home',
       name: 'Home',
       component: Home
     },
@@ -33,10 +35,12 @@ export default new Router({
     {
       path: '/order',
       name: 'order',
-      component: Order,
-      children:[
-        
-      ]
+      component: Order
+    },
+    {
+      path: '/',
+      name: 'order-edit',
+      component: OrderEdit
     },
     {
       path: '/order-detail',
