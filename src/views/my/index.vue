@@ -18,8 +18,7 @@
   </div>
 
   <van-cell-group>
-  <van-cell icon="location-o" title="代理商管理" is-link  />
-  <van-cell icon="location-o" title="商品管理" is-link />
+  <van-cell v-for="(item,index) in myList" :key="index" icon="location-o" :title="item.title" is-link @click="goto(item.name)"  />
 </van-cell-group>
 
 
@@ -39,18 +38,31 @@ export default {
   components: {},
   data() {
     //这里存放数据
-    return {};
+    return {
+      myList:[
+        {title:"代理商管理",name:"mail-list"},
+        {title:"商品管理",name:"shop-list"},
+
+      ]
+
+    };
   },
   //监听属性 类似于data概念
   computed: {},
   //监控data中的数据变化
   watch: {},
   //方法集合
-  methods: {},
+  methods: {
+    goto(name){
+       this.$router.push({name: name,});
+    }
+  },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {},
   //生命周期 - 挂载完成（可以访问DOM元素）
-  mounted() {},
+  mounted() {
+    
+  },
   beforeCreate() {}, //生命周期 - 创建之前
   beforeMount() {}, //生命周期 - 挂载之前
   beforeUpdate() {}, //生命周期 - 更新之前
