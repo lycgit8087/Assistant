@@ -1,0 +1,153 @@
+<!-- supplier -->
+<template>
+  <div class="supplier">
+      <van-nav-bar title="供应商管理" :fixed="true" placeholder />
+
+      <div class="pview">
+        <!-- 搜索按钮 -->
+        <van-search class="poeple_search" v-model="peoplesearch" placeholder="请输入搜索关键词" />
+        <div class="allpeople">
+          <div class="allpeoplechild" v-for="item in 3" :key="item" >
+            <van-image fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
+            <div class="allpeoplechild_right">
+              <p class="allpeoplechild_right_des">
+                <span>林有有</span>
+                <span>185 7876 5543</span>
+              </p>
+              <!-- 下单渠道 -->
+              <van-cell-group>
+                <van-cell title="下单渠道名称02"  >
+                  <template #right-icon>
+                    <div class="iconview" >
+                      <van-icon name="search" class="search=icon" />
+                    </div>
+                  </template>
+                </van-cell>
+
+                <van-cell title="下单渠道名称02">
+                  <template #right-icon>
+                    <div class="iconview" >
+                      <van-icon name="search" class="search=icon" />
+                    </div>
+                  </template>
+                </van-cell>
+                
+              </van-cell-group>
+            </div>
+          </div>
+
+          <van-button type="info">确定</van-button>
+        </div>
+      </div>
+
+  </div>
+
+  
+</template>
+
+<script>
+//这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
+//例如：import 《组件名称》 from '《组件路径》';
+
+export default {
+  //import引入的组件需要注入到对象中才能使用
+  name: "supplier",
+  components: {},
+  data() {
+    //这里存放数据
+    return {
+      peoplesearch:""
+
+    };
+  },
+  //监听属性 类似于data概念
+  computed: {},
+  //监控data中的数据变化
+  watch: {},
+  //方法集合
+  methods: {
+    goto(name){
+       this.$router.push({name: name,});
+    }
+  },
+  //生命周期 - 创建完成（可以访问当前this实例）
+  created() {},
+  //生命周期 - 挂载完成（可以访问DOM元素）
+  mounted() {
+    
+  },
+  beforeCreate() {}, //生命周期 - 创建之前
+  beforeMount() {}, //生命周期 - 挂载之前
+  beforeUpdate() {}, //生命周期 - 更新之前
+  updated() {}, //生命周期 - 更新之后
+  beforeDestroy() {}, //生命周期 - 销毁之前
+  destroyed() {}, //生命周期 - 销毁完成
+  activated() {} //如果页面有keep-alive缓存功能，这个函数会触发
+};
+</script>
+<style >
+html{
+    background: #fff;
+}
+.pview {
+  width: 100%;
+  height: 590px;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
+  box-sizing: border-box;
+}
+.pview_title {
+  font-size: 14px;
+  font-weight: 400;
+  color: #bdbdbd;
+  margin-bottom: 10px;
+}
+.poeple_search {
+  padding: 0;
+  margin-bottom: 20px;
+}
+.allpeople {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.allpeoplechild {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+.allpeoplechild .van-image {
+  width: 44px;
+  height: 44px;
+  border-radius: 11px;
+  margin-right: 16px;
+}
+.allpeoplechild_right {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+.allpeoplechild_right_des {
+  height: 44px;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+.allpeoplechild_right_des span:nth-child(1) {
+  font-size: 14px;
+  font-weight: 600;
+  color: #202020;
+  margin-bottom: 2px;
+}
+.allpeoplechild_right_des span:nth-child(2) {
+  font-size: 12px;
+  font-weight: 600;
+  color: #707070;
+}
+.cellclass{
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+</style>

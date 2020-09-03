@@ -8,6 +8,10 @@ import OrderDetail from '@/views/order/order-detail'
 import Maillist from '@/views/my/mail-list'
 import Login from '@/views/login'
 import OrderEdit from '@/views/order/order-edit'
+import Supplier from '@/views/my/supplier'
+import Machine from '@/views/login/machine'
+
+
 
 
 
@@ -16,9 +20,8 @@ import OrderEdit from '@/views/order/order-edit'
 Vue.use(Router)
 
 export default new Router({
-  routes: [
-    {
-      path: '/',
+  routes: [{
+      path: '/home',
       name: 'Home',
       component: Home
     },
@@ -28,9 +31,23 @@ export default new Router({
       component: Login
     },
     {
+      path: '/supplier',
+      name: 'supplier',
+      component: Supplier,
+      title: "供应商管理"
+    },
+    {
+      path: '/machine',
+      name: 'machine',
+      component: Machine,
+      title: "添加下单助手"
+    },
+    {
       path: '/my',
       name: 'my',
-      component: My
+      component: My,
+      title: "我的"
+
     },
     {
       path: '/order',
@@ -48,8 +65,8 @@ export default new Router({
       component: OrderDetail
     },
     {
-      path:'/mail-list',
-      name:"mail-list",
+      path: '/',
+      name: "mail-list",
       component: Maillist,
     }
   ]

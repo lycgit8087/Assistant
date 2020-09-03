@@ -84,7 +84,6 @@
     <van-popup v-model="peopleShow" position="bottom" closeable>
       <div class="pview">
         <p class="pview_title">请选择供应商</p>
-
         <!-- 搜索按钮 -->
         <van-search class="poeple_search" v-model="peoplesearch" placeholder="请输入搜索关键词" />
         <div class="allpeople">
@@ -98,7 +97,7 @@
 
               <!-- 下单链接 -->
               <van-cell-group>
-                <van-cell title="下单链接名称02"  >
+                <van-cell title="下单渠道名称02"  >
                   <template #right-icon>
                     <div class="iconview" >
                       <van-icon name="search" class="search=icon" />
@@ -106,7 +105,7 @@
                   </template>
                 </van-cell>
 
-                <van-cell title="下单链接名称02">
+                <van-cell title="下单渠道名称02">
                   <template #right-icon>
                     <div class="iconview" >
                       <van-icon name="search" class="search=icon" />
@@ -215,7 +214,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped >
+<style  >
 .tabListChild {
   display: flex;
   align-items: center;

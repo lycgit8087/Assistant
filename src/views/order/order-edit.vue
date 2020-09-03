@@ -1,6 +1,6 @@
 <template>
   <div class="order-edit">
-    <van-nav-bar title="下单链接" :fixed="true" placeholder />
+    <van-nav-bar title="下单渠道" :fixed="true" placeholder />
 
     <van-form validate-first @failed="onFailed">
       <!-- 智能识别地址 -->

@@ -13,7 +13,7 @@
             <div class="mial_people_left_des">
               <p>
                 <span>林有有</span>
-                <span>（下单链接数：3）</span>
+                <span>（下单渠道数：3）</span>
               </p>
               <span>185 7876 5543</span>
             </div>
@@ -25,41 +25,24 @@
           <van-button square text="删除" type="danger" class="delete-button" />
         </template>
       </van-swipe-cell>
-      
-
-      <van-index-anchor index="B" />
-      <van-cell title="文本" />
-      <van-cell title="文本" />
-      <van-cell title="文本" />
-
-      <van-index-anchor index="C" />
-      <van-cell title="文本" />
-      <van-cell title="文本" />
-      <van-cell title="文本" />
-
-      <van-index-anchor index="D" />
-      <van-cell title="文本" />
-      <van-cell title="文本" />
-      <van-cell title="文本" />
-      <van-index-anchor index="E" />
-      <van-cell title="文本" />
-      <van-cell title="文本" />
-      <van-cell title="文本" />
-
-      <van-index-anchor index="F" />
-      <van-cell title="文本" />
-      <van-cell title="文本" />
-      <van-cell title="文本" />
-      <van-index-anchor index="G" />
-      <van-cell title="文本" />
-      <van-cell title="文本" />
-      <van-cell title="文本" />
-
-      <van-index-anchor index="H" />
-      <van-cell title="文本" />
-      <van-cell title="文本" />
-      <van-cell title="文本" />
+    
     </van-index-bar>
+
+    <div class="fix-btn" >
+        <van-button type="info" class="addbtn" @click="show=true" >添加代理商</van-button>
+
+    </div>
+   <van-popup v-model="show" closeable>
+      <div class="addpeople flex-align-center" >
+        <p class="add-people-title" >添加代理商</p>
+        <p class="add-people-text" >代理商名称</p>
+        <van-field v-model="username"  class="field-no-padding" :border="false" placeholder="请输入商品名称规格等信息" />
+
+        <p class="add-people-text" >手机号码</p>
+        <van-field v-model="ophone" class="field-no-padding" :border="false"  placeholder="请输入手机号码" />
+        <van-button class="keepbtn" type="info">保存</van-button>
+      </div>
+   </van-popup>
   </div>
 </template>
 
@@ -75,6 +58,10 @@ export default {
     //这里存放数据
     return {
       value: "",
+      show:true,
+      username:"",
+      ophone:"",
+
     };
   },
   //监听属性 类似于data概念
@@ -160,7 +147,49 @@ export default {
   color: #7ebeff;
   line-height: 17px;
 }
-.van-button--normal{
+ .van-swipe-cell__right .van-button--normal{
     height: 100% !important;
+}
+.addpeople{
+  width: 297px;
+height: 330px;
+background: #FFFFFF;
+border-radius: 10px;
+padding: 15px 21px;
+box-sizing: border-box;
+flex-direction: column;
+
+}
+.add-people-title{
+  display: flex;
+  font-size: 18px;
+  font-weight: 500;
+  color: #28292E;
+  margin-bottom: 10px;
+
+}
+.add-people-text{
+font-size: 14px;
+font-weight: 400;
+color: #28292E;
+margin-bottom: 9px;
+width: 100%;
+margin-top: 20px;
+
+}
+.keepbtn{
+ width: 255px !important;
+  box-shadow: 0px 9px 15px 1px rgba(0, 120, 255, 0.15);
+  border-radius: 5px;
+  margin-top: 57px;
+}
+.fix-btn{
+  position: fixed;
+  bottom: 3vh;
+  left: 50%;
+  transform: translate(-50%,0);
+}
+.addbtn{
+  width: 255px;
 }
 </style>
