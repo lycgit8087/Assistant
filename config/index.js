@@ -4,13 +4,23 @@
 
 const path = require('path')
 
+
 module.exports = {
   dev: {
 
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      '/api': {
+        // target: 'https://wse.imofang.cn/app.aspx',//后端接口地址
+        target:"https://newaits.imofang.cn/app.aspx",
+        changeOrigin: true,//是否允许跨越
+        pathRewrite: {
+            '^/api': '',//重写,
+        }
+    }
+    },
 
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST
@@ -20,7 +30,14 @@ module.exports = {
     notifyOnErrors: true,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
 
-    
+    // Use Eslint Loader?
+    // If true, your code will be linted during bundling and
+    // linting errors and warnings will be shown in the console.
+    useEslint: true,
+    // If true, eslint errors and warnings will also be shown in the error overlay
+    // in the browser.
+    showEslintErrorsInOverlay: false,
+
     /**
      * Source Maps
      */
@@ -44,12 +61,21 @@ module.exports = {
     assetsRoot: path.resolve(__dirname, '../dist'),
     assetsSubDirectory: 'static',
     assetsPublicPath: './',
+    proxyTable: {
+      '/api': {
+        target: 'https://wse.imofang.cn/app.aspx',//后端接口地址
+        changeOrigin: true,//是否允许跨越
+        pathRewrite: {
+            '^/api': '',//重写,
+        }
+    }
+    },
 
     /**
      * Source Maps
      */
 
-    productionSourceMap: true,
+    productionSourceMap: false,
     // https://webpack.js.org/configuration/devtool/#production
     devtool: '#source-map',
 

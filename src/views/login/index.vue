@@ -14,17 +14,18 @@
         </div>
 
       </div>
+      <van-form validate-first @failed="onFailed">
 
-
-      <van-field :maxlength="11" :rules="[{ validator, message: '请输入正确内容' }]" v-model="tel" type="tel" placeholder="请输入手机号码" />
-      <van-divider />
-      <van-field  v-model="sms" center clearable  placeholder="请输入短信验证码">
+      <van-field   :maxlength="11" :rules="[{ validator, message: '请输入11位有效手机号码' }]" v-model="phone" type="tel" placeholder="请输入手机号码" />
+      
+      <van-field   v-model="sms" center   placeholder="请输入短信验证码">
         <template #button>
-          <van-button size="small" type="primary" color="#082A54" >发送验证码</van-button>
+          <van-button size="small" type="primary" color="#082A54" @click="getSms" >发送验证码</van-button>
         </template>
       </van-field>
-      <van-divider />   
-      <van-button type="primary" color="#082A54" size="large">登录</van-button>
+      <van-button class="loginbtn" native-type="submit" type="primary" color="#082A54" size="large">登录</van-button>
+
+      </van-form>
     </div>
   </div>
   
@@ -42,7 +43,7 @@ export default {
     //这里存放数据
     return {
       value: "",
-      tel: "",
+      phone: "",
       sms:"",
       pattern:'',
       identity:[
@@ -65,6 +66,28 @@ export default {
     chnageIdentity(index){
       this.identityNum=index
     },
+    // 获取验证码
+    getSms(){
+      let {phone}=this
+      this.$post("sms_vcode_get", "/?c=api", {
+        mobile:phone
+      }).then(res=>{
+        console.log(res)
+      })
+    },
+    onFailed() {
+      let {phone,sms}=this
+      if(this.validator(phone)&&sms.length!=0&&identityNum!=-1){
+        this.$post("user_bind", "/?c=api", {
+        utype:phone,
+        mobile:phone,
+        vcode:sms
+      }).then(res=>{
+        console.log(res)
+      }) 
+      }
+    },
+
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {},
@@ -137,5 +160,11 @@ color: #082A54;
 }
 .active_boder{
   border: 2px  solid #082A54;
+}
+.loginbtn{
+  margin-top: 46px;
+}
+.loginView {
+
 }
 </style>

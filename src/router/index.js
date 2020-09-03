@@ -65,7 +65,7 @@ export default new Router({
       component: OrderDetail
     },
     {
-      path: '/',
+      path: '/mail-list',
       name: "mail-list",
       component: Maillist,
     }

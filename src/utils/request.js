@@ -8,6 +8,7 @@ let loadingInstance = null
 let timer;
 const hash = require("./hmac-sha256")
 const root = process.env.API_ROOT;
+console.log(process.env)
 axios.defaults.retry = 4;
 axios.defaults.retryDelay = 1000;
 
@@ -25,6 +26,7 @@ axios.interceptors.request.use(
     const token = localStorage.getItem("token");
     config.baseURL = ''
     config.url = root + config.url;
+    console.log(config.url)
     config.withCredentials = true // 允许携带token ,这个是解决跨域产生的相关问题
     config.timeout = 15000  //超时时间
     config.data = qs.stringify(config.data);
