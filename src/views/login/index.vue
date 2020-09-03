@@ -14,7 +14,7 @@
         </div>
 
       </div>
-      <van-form validate-first @failed="onFailed">
+      <van-form validate-first @submit="onsubmit">
 
       <van-field   :maxlength="11" :rules="[{ validator, message: '请输入11位有效手机号码' }]" v-model="phone" type="tel" placeholder="请输入手机号码" />
       
@@ -75,11 +75,12 @@ export default {
         console.log(res)
       })
     },
-    onFailed() {
-      let {phone,sms}=this
+    onsubmit() {
+      
+      let {phone,sms,identityNum}=this
       if(this.validator(phone)&&sms.length!=0&&identityNum!=-1){
         this.$post("user_bind", "/?c=api", {
-        utype:phone,
+        utype:identityNum,
         mobile:phone,
         vcode:sms
       }).then(res=>{
