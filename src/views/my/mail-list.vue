@@ -148,11 +148,7 @@ export default {
         }).then(res=>{
             console.log(res)
             list.forEach((item,index)=>{
-                item.forEach((ditem,dindex)=>{
-                    if(ditem.lid==lid){
-                        item[index].data.splice(dindex,1)
-                    }
-                })
+            item.data=item.data.filter(ditem=>ditem.lid!=lid)
             })
         })
         this.list=list
