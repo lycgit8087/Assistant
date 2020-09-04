@@ -94,7 +94,6 @@
                 <span>林有有</span>
                 <span>185 7876 5543</span>
               </p>
-
               <!-- 下单链接 -->
               <van-cell-group>
                 <van-cell title="下单渠道名称02"  >
@@ -189,6 +188,8 @@ export default {
       peopleShow: false,
     };
   },
+  created(){
+  },
   methods: {
     formatDate(date) {
       return `${date.getMonth() + 1}/${date.getDate()}`;
@@ -199,7 +200,6 @@ export default {
       this.popupShow = !popupShow;
     },
     to_detail() {
-      console.log(111);
       this.$router.push({
         name: "order-detail",
       });

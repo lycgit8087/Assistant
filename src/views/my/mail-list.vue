@@ -2,47 +2,62 @@
 <template>
   <div class="mail-list">
     <van-nav-bar title="代理商管理" :fixed="true" placeholder />
-    <van-search v-model="value" placeholder="请输入搜索关键词" />
+    <van-search v-model="searchValue" placeholder="请输入搜索关键词" />
 
-    <van-index-bar>
-      <van-index-anchor index="A" />
-      <van-swipe-cell v-for="(item,index) in 3" :key="index" >
+    <van-index-bar :index-list="indexList" >
+      <div v-for="(item,index) in list" :key="index"  >
+          <van-index-anchor :index="item.title" />
+      <van-swipe-cell v-for="(ditem,dindex) in item.data" :key="dindex" :before-close="beforeClose" :name="ditem.lid" >
         <div class="mial_people">
           <div class="mial_people_left">
             <van-image fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
             <div class="mial_people_left_des">
               <p>
-                <span>林有有</span>
-                <span>（下单渠道数：3）</span>
+                <span>{{ditem.name}}</span>
+                <span>（下单渠道数：{{ditem.link_count}}）</span>
               </p>
-              <span>185 7876 5543</span>
+              <span>{{ditem.mobile}}</span>
             </div>
           </div>
-
-          <p>已注册</p>
+          <p>{{ditem.rstatus==0?"未注册":"已注册"}}</p>
         </div>
         <template #right>
           <van-button square text="删除" type="danger" class="delete-button" />
         </template>
       </van-swipe-cell>
-    
+      </div>
+      
     </van-index-bar>
 
-    <div class="fix-btn" >
-        <van-button type="info" class="addbtn" @click="show=true" >添加代理商</van-button>
-
+    <div class="fix-btn">
+      <van-button type="info" class="addbtn" @click="show=true">添加代理商</van-button>
     </div>
-   <van-popup v-model="show" closeable>
-      <div class="addpeople flex-align-center" >
-        <p class="add-people-title" >添加代理商</p>
-        <p class="add-people-text" >代理商名称</p>
-        <van-field v-model="username"  class="field-no-padding" :border="false" placeholder="请输入商品名称规格等信息" />
+    <van-popup v-model="show" closeable>
+      <div class="addpeople flex-align-center">
+        <van-form validate-first @submit="onsubmit">
+          <p class="add-people-title">添加代理商</p>
+          <p class="add-people-text">代理商名称</p>
+          <van-field
+            v-model="username"
+            :rules="[{ validator:regUserName, message: '请输入代理商名称' }]"
+            class="field-no-padding"
+            :border="false"
+            placeholder="代理商名称"
+          />
 
-        <p class="add-people-text" >手机号码</p>
-        <van-field v-model="ophone" class="field-no-padding" :border="false"  placeholder="请输入手机号码" />
-        <van-button class="keepbtn" type="info">保存</van-button>
+          <p class="add-people-text">手机号码</p>
+          <van-field
+            :maxlength="11"
+            :rules="[{ validator, message: '请输入11位有效手机号码' }]"
+            v-model="ophone"
+            class="field-no-padding"
+            :border="false"
+            placeholder="请输入手机号码"
+          />
+          <van-button native-type="submit" class="keepbtn" type="info">保存</van-button>
+        </van-form>
       </div>
-   </van-popup>
+    </van-popup>
   </div>
 </template>
 
@@ -58,10 +73,13 @@ export default {
     //这里存放数据
     return {
       value: "",
-      show:true,
-      username:"",
-      ophone:"",
-
+      show: false,
+      username: "",
+      ophone: "",
+      searchValue: "",
+      list:[],
+      oldList:[],
+      indexList:[]
     };
   },
   //监听属性 类似于data概念
@@ -69,9 +87,71 @@ export default {
   //监控data中的数据变化
   watch: {},
   //方法集合
-  methods: {},
+  methods: {
+    // 获取列表
+    getList() {
+      let { searchValue,indexList } = this;
+      this.$api.agent
+        .list({
+          is_link: 0,
+          name: "",
+        })
+        .then((res) => {
+          indexList=[]
+          let {data}=res
+          data.forEach((item,index)=>{
+            item.first_letter=item.first_letter.toUpperCase()
+          })
+          let newData=this.$util.filter_identical(data,"first_letter")
+          let listData=newData.sort(this.$util.sortBy("title"))
+          listData.forEach((item)=>{
+            indexList.push(item.title)
+          })
+          this.indexList=indexList
+          this.list=listData
+
+        });
+    },
+
+    // 代理商添加
+    onsubmit() {
+      let { username, ophone } = this;
+      this.$api.agent.add({
+        name: username,
+        mobile: ophone,
+      }).then(res=>{
+       this.$Toast.success('添加成功');
+       this.getList()
+      });
+    },
+
+    beforeClose({name,position,instance}){
+      
+      if(position=="right"){
+        this.$Dialog.confirm({
+            message: '确定删除吗？',
+          }).then(() => {
+            console.log(name)
+            instance.close();
+          });
+      }
+    },
+
+    
+
+    // 检测手机号码
+    validator(val) {
+      return /^[1][3,4,5,6,7,8,9][0-9]{9}$/.test(val);
+    },
+    // 检测用户名
+    regUserName(val){
+      return /^[\u4E00-\u9FA5]{2,4}$/.test(val)
+    }
+  },
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created() {
+    this.getList();
+  },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   beforeCreate() {}, //生命周期 - 创建之前
@@ -147,49 +227,45 @@ export default {
   color: #7ebeff;
   line-height: 17px;
 }
- .van-swipe-cell__right .van-button--normal{
-    height: 100% !important;
+.van-swipe-cell__right .van-button--normal {
+  height: 100% !important;
 }
-.addpeople{
+.addpeople {
   width: 297px;
-height: 330px;
-background: #FFFFFF;
-border-radius: 10px;
-padding: 15px 21px;
-box-sizing: border-box;
-flex-direction: column;
-
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 15px 21px;
+  box-sizing: border-box;
+  flex-direction: column;
 }
-.add-people-title{
+.add-people-title {
   display: flex;
   font-size: 18px;
   font-weight: 500;
-  color: #28292E;
+  color: #28292e;
   margin-bottom: 10px;
-
 }
-.add-people-text{
-font-size: 14px;
-font-weight: 400;
-color: #28292E;
-margin-bottom: 9px;
-width: 100%;
-margin-top: 20px;
-
+.add-people-text {
+  font-size: 14px;
+  font-weight: 400;
+  color: #28292e;
+  margin-bottom: 9px;
+  width: 100%;
+  margin-top: 20px;
 }
-.keepbtn{
- width: 255px !important;
+.keepbtn {
+  width: 255px !important;
   box-shadow: 0px 9px 15px 1px rgba(0, 120, 255, 0.15);
   border-radius: 5px;
   margin-top: 57px;
 }
-.fix-btn{
+.fix-btn {
   position: fixed;
   bottom: 3vh;
   left: 50%;
-  transform: translate(-50%,0);
+  transform: translate(-50%, 0);
 }
-.addbtn{
+.addbtn {
   width: 255px;
 }
 </style>

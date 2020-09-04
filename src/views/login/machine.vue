@@ -2,14 +2,14 @@
 <template>
   <div class="machine">
     <van-nav-bar title="添加下单小助手" :fixed="true" placeholder />
-    <p class="skip">跳过</p>
+    <p class="skip" @click="toHome" >跳过</p>
     <div class="machine_qrcode mt30 flexallcenter">
       <van-image fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
       <span class="machine_qrcode_text">长按添加下单小助手</span>
       <span class="machine_qrcode_text">它让您快速生成订单</span>
     </div>
 
-    <p class="mach_text">第一步：您只需要把客户的下单信息(如姓名:玩尼玛，电话:18866677755 地址:广州市天河区华观路火炉山热点创意园301)发给小助手；</p>
+    <p class="mach_text">第一步：您只需要把客户的下单信息(如姓名:曾某某，电话:18866677755 地址:广州市天河区华观路火炉山热点创意园301)发给小助手；</p>
     <p class="mach_text">第二步：回到订单列表页面，已经生成一个待确认的订单，您只需要批量操作进行订单确认，发给供应商确认等待发货；</p>
   </div>
 </template>
@@ -31,7 +31,12 @@ export default {
   //监控data中的数据变化
   watch: {},
   //方法集合
-  methods: {},
+  methods: {
+    toHome(){
+          this.$router.push({name: 'home',});
+      
+    },
+  },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {},
   //生命周期 - 挂载完成（可以访问DOM元素）

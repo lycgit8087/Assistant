@@ -1,14 +1,12 @@
 import axios from 'axios';
 import { Toast,Notify  } from 'vant';
-
+import api from '../api'
 import qs from 'qs'
 import router from '../router'
 let requestCount = 0;
 let loadingInstance = null
 let timer;
-const hash = require("./hmac-sha256")
 const root = process.env.API_ROOT;
-console.log(process.env)
 axios.defaults.retry = 4;
 axios.defaults.retryDelay = 1000;
 
@@ -26,7 +24,6 @@ axios.interceptors.request.use(
     const token = localStorage.getItem("token");
     config.baseURL = ''
     config.url = root + config.url;
-    console.log(config.url)
     config.withCredentials = true // 允许携带token ,这个是解决跨域产生的相关问题
     config.timeout = 15000  //超时时间
     config.data = qs.stringify(config.data);
@@ -38,10 +35,10 @@ axios.interceptors.request.use(
         "token":token
       }
     }else{
-      if(config.headers.action =="token_update"){
+      if(config.headers.action =="user_token_update"){
         config.headers = {
           'Content-Type':'application/x-www-form-urlencoded',
-          "action":"token_update",
+          "action":"user_token_update",
           "token":token
 
         }
@@ -57,7 +54,7 @@ axios.interceptors.request.use(
     return config;
   },
   error => {
-    return Promise.reject(err);
+    return Promise.reject(error);
   }
 );
 
@@ -75,7 +72,6 @@ function tryHideLoading() {
   })
 }
 
-
 //http response 拦截器
 axios.interceptors.response.use(
   response => {
@@ -85,166 +81,69 @@ axios.interceptors.response.use(
       let now_time=Date.parse(new Date())
       let is_get_token=((token_time-now_time)/60000)>10
       if(!is_get_token&&token_time){
-          get_new_token(config);
+          api.user.tokenUpdate(res=>{
+            console.log(res)
+          })
       }
       if(response.data.response_code==-1){
         let errmessage = response.data.response_msg.toLowerCase()
         if(errmessage.indexOf("token")!=-1){
-          localStorage.setItem("token", "");
-          router.replace({ name: "Login"});
+          console.log(1111)
+          //   Notify({
+          //       message: response.data.response_msg,
+          //       type: 'warning',
+          //       duration: 3 * 1000
+          //     })
+          // localStorage.setItem("token", "");
+          // router.replace({ name: "login"});
+
+          api.user.tokenUpdate(res=>{
+            console.log(res)
+          })
         }else{
-            Notify({
+          Notify({
             message: errmessage,
             type: 'warning',
             duration: 3 * 1000
           })
         }      
       }
-    return response;
+    return response.data;
   },
   error => {
     tryHideLoading()
+    console.log(error)
     return Promise.reject(error)
   }
 )
 
 
-// 获取新token
-export async function get_new_token(config){
-  
-  const token = localStorage.getItem("token");
-  return new Promise((resolve,reject) => {
-    axios.post("/?c=api", {}, { 
-    headers: { 
-    "action" : "token_update",
-    token:token
 
-  } 
-}
-).then((response) => {
-  if(response.data.response_code==0){
-    if(response.data.token){
-    let token_time= Date.parse(response.data.token_expires)
-    localStorage.setItem("token_time",token_time)
-    localStorage.setItem("token",response.data.token)
-    axios(config);
-    }else{
-    resolve(response.data);  
-    }
-  }else{
-    reject(response)
+ export default function(action,url, params = {}) {
+  const defaultConfig = {
+    url,
+    method: 'POST',
+    timeout: 1000 * 20,
+    headers: {
+      'Content-Type': 'application/json;charset=UTF-8',
+      action:action
+    },
+    baseURL: process.env.API_ROOT,
+    withCredentials: true, // 允许cookie跨域
+    useToken: true, // 是否需要token
+    useErrorTips: true // 默认系统提示
   }
-}).catch(err => {
-    reject(err)
-  });  
-})
-}
-
-// 获取token
-export function get_token(url,params={}){
-  return new Promise((resolve,reject) => {
-      axios.post(url, params, { 
-      headers: { 
-      "action" : "token_get",
-    } 
-  }
-  ).then((response) => {
-    if(response.data.response_code==0){
-      if(response.data.token){
-      let token_time= Date.parse(response.data.token_expires)
-      
-      localStorage.setItem("token_time",token_time)
-
-      localStorage.setItem("token",response.data.token)
-
-      }
-      resolve(response.data);
-
-    }else{
-      reject(response)
-    }
-  }).catch(err => {
-      reject(err)
-    });  
-  })
+  const newConfig =Object.assign(defaultConfig,params) 
+  // token 开关
+  // if (newConfig.useToken) {
+  //   const token = storage.get(ACCESS_TOKEN)
+  //   newConfig.headers = {
+  //     token,
+  //     ...newConfig.headers
+  //   }
+  // }
+  return axios(newConfig)
 }
 
 
 
-/**
- * 封装get方法
- * @param url
- * @param data
- * @returns {Promise}
- */
-
-export function fetch(url,params={}){
-  return new Promise((resolve,reject) => {
-    axios.get(url,{
-      params:params
-    })
-    .then(response => {
-      resolve(response.data);
-    })
-    .catch(err => {
-      reject(err)
-    })
-  })
-}
-
-
-/**
- * 封装post请求
- * @param url
- * @param data
- * @returns {Promise}
- */
-
- export function post(apiaction,url,data){
-  return new Promise((resolve,reject) => {
-    axios.post(url, data, { headers: {
-    "action":apiaction, } }
-).then((response) => {
-    resolve(response.data);
-
-}).catch(err => {
-    reject(err)
-  });  
-})
- }
-
- /**
- * 封装patch请求
- * @param url
- * @param data
- * @returns {Promise}
- */
-
-export function patch(url,data = {}){
-  return new Promise((resolve,reject) => {
-    axios.patch(url,data)
-         .then(response => {
-           resolve(response.data);
-         },err => {
-           reject(err)
-         })
-  })
-}
-
- /**
- * 封装put请求
- * @param url
- * @param data
- * @returns {Promise}
- */
-
-export function put(url,data = {}){
-  return new Promise((resolve,reject) => {
-    axios.put(url,data)
-         .then(response => {
-           resolve(response.data);
-         },err => {
-           reject(err)
-         })
-  })
-}

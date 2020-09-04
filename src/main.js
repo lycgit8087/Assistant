@@ -4,19 +4,22 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import Vant from 'vant';
-import axios from 'axios';
 import 'vant/lib/index.css';
 import 'amfe-flexible/index.js'
-import {post,fetch,patch,put,get_token,get_new_token} from './utils/request'
+import api from './api'
+import util from './utils/util.js'
+
 import store from "./store"
-Vue.prototype.$get_new_token=get_new_token
-Vue.prototype.$post=post;
-
+import { Toast, Notify, Dialog} from "vant";
 Vue.use(Vant);
-Vue.prototype.$axios=axios;
-
-
+Vue.prototype.$api = api
+Vue.prototype.$util = util
 Vue.config.productionTip = false
+Vue.prototype.$Toast = Toast
+Vue.prototype.$Notify = Notify
+Vue.prototype.$Dialog = Dialog
+
+
 
 /* eslint-disable no-new */
 new Vue({
