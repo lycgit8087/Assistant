@@ -1,7 +1,7 @@
 <!-- supplier -->
 <template>
   <div class="supplier">
-      <van-nav-bar title="供应商管理" :fixed="true" placeholder />
+      <van-nav-bar left-arrow @click-left="backTo" title="供应商管理" :fixed="true" placeholder />
 
       <div class="pview">
         <!-- 搜索按钮 -->
@@ -48,11 +48,12 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-
+import {mixin} from "../../mixin/mixin"
 export default {
   //import引入的组件需要注入到对象中才能使用
   name: "supplier",
   components: {},
+   mixins:[mixin],
   data() {
     //这里存放数据
     return {
@@ -68,7 +69,8 @@ export default {
   methods: {
     goto(name){
        this.$router.push({name: name,});
-    }
+    },
+    
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {},

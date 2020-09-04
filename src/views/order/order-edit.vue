@@ -1,6 +1,6 @@
 <template>
   <div class="order-edit">
-    <van-nav-bar title="下单渠道" :fixed="true" placeholder />
+    <van-nav-bar title="下单渠道" left-arrow @click-left="backTo" :fixed="true" placeholder />
 
     <van-form validate-first @failed="onFailed">
       <!-- 智能识别地址 -->
@@ -91,9 +91,12 @@
 
 <script>
   import AreaList from  "../../assets/js/area"
+import {mixin} from "../../mixin/mixin"
   
 export default {
   name: "order-edit",
+   mixins:[mixin],
+
   data() {
     return {
       value1: "",

@@ -41,7 +41,7 @@ export default {
     return {
       myList:[
         {title:"代理商管理",name:"mail-list"},
-        {title:"商品管理",name:"shop-list"},
+        {title:"供应商管理",name:"supplier"},
       ]
 
     };

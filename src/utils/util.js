@@ -18,6 +18,11 @@
  function validator(val) {
     return /^[1][3,4,5,6,7,8,9][0-9]{9}$/.test(val);
   }
+//   检测六位数验证码
+
+  function  smsValidator(val) {
+    return /\d{6}/.test(val);
+  }
 
 
 // 深度克隆对象
@@ -42,5 +47,6 @@
     filter_identical,
     validator,
     cloneObject,
-    sortBy
+    sortBy,
+    smsValidator
   };

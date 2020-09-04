@@ -1,7 +1,7 @@
 <!-- mail-list -->
 <template>
   <div class="mail-list">
-    <van-nav-bar title="代理商管理" :fixed="true" placeholder />
+    <van-nav-bar left-arrow @click-left="backTo" title="代理商管理" :fixed="true" placeholder />
     <van-search v-model="searchValue" placeholder="请输入搜索关键词" />
 
     <van-index-bar :index-list="indexList" >
@@ -64,11 +64,13 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-
+import {mixin} from "../../mixin/mixin"
 export default {
   //import引入的组件需要注入到对象中才能使用
   name: "mail-list",
   components: {},
+   mixins:[mixin],
+
   data() {
     //这里存放数据
     return {
@@ -132,11 +134,29 @@ export default {
             message: '确定删除吗？',
           }).then(() => {
             console.log(name)
+            this.del(name)
             instance.close();
           });
       }
     },
 
+    // 删除代理商
+    del(lid){
+        let{list}=this
+        this.$api.agent.del({
+            lid:lid
+        }).then(res=>{
+            console.log(res)
+            list.forEach((item,index)=>{
+                item.forEach((ditem,dindex)=>{
+                    if(ditem.lid==lid){
+                        item[index].data.splice(dindex,1)
+                    }
+                })
+            })
+        })
+        this.list=list
+    },
     
 
     // 检测手机号码
