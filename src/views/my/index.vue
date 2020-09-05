@@ -2,30 +2,32 @@
 <template>
   <div class="my">
     <div class="my_top">
-      <van-image fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
-      <span>施瓦辛格</span>
+      <van-image fit="cover" :src="this.$store.state.userInfo.avatar" />
+      <span>{{this.$store.state.userInfo.name}}</span>
     </div>
 
     <!-- 订单管理 -->
-  <div class="my_order">
-    <span>订单管理</span>
-    <div class="my_order_chlid">
-      <div v-for="(item,index) in 3" :key="index">
-        <van-image fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
-        <span>我代理的订单</span>
+    <div class="my_order">
+      <span>订单管理</span>
+      <div class="my_order_chlid">
+        <div v-for="(item,index) in orderList" @click="openIt(item.name)" :key="index">
+          <van-image fit="cover" :src="item.url" />
+          <span>{{item.title}}</span>
+        </div>
       </div>
     </div>
+
+    <van-cell-group>
+      <van-cell
+        v-for="(item,index) in myList"
+        :key="index"
+        :icon="item.icon"
+        :title="item.title"
+        is-link
+        @click="goto(item.name)"
+      />
+    </van-cell-group>
   </div>
-
-  <van-cell-group>
-  <van-cell v-for="(item,index) in myList" :key="index" icon="location-o" :title="item.title" is-link @click="goto(item.name)"  />
-</van-cell-group>
-
-
-
-  </div>
-
-  
 </template>
 
 <script>
@@ -39,11 +41,30 @@ export default {
   data() {
     //这里存放数据
     return {
-      myList:[
-        {title:"代理商管理",name:"mail-list"},
-        {title:"供应商管理",name:"supplier"},
-      ]
-
+      myList: [
+        { title: "代理商管理", name: "mail-list", icon: "cluster-o" },
+        { title: "供应商管理", name: "supplier", icon: "points" },
+      ],
+      orderList: [
+        {
+          title: "我供货的订单",
+          type: "2",
+          url: require("../../assets/images/money.png"),
+          name: "agent",
+        },
+        {
+          title: "我代理的订单",
+          type: "1",
+          url: require("../../assets/images/dollar.png"),
+          name: "agent",
+        },
+        {
+          title: "我购买的订单",
+          type: "0",
+          url: require("../../assets/images/charity.png"),
+          name: "agent",
+        },
+      ],
     };
   },
   //监听属性 类似于data概念
@@ -52,15 +73,22 @@ export default {
   watch: {},
   //方法集合
   methods: {
-    goto(name){
-       this.$router.push({name: name,});
-    }
+    goto(name) {
+      this.$router.push({ name: name });
+    },
+    openIt(name) {
+      this.$router.push({ name: name });
+
+      // this.$api.user.tokenUpdate(res=>{
+      //       console.log(res)
+      //     })
+    },
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {},
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
-    
+    console.log(this.$store.state.userInfo);
   },
   beforeCreate() {}, //生命周期 - 创建之前
   beforeMount() {}, //生命周期 - 挂载之前
@@ -68,7 +96,7 @@ export default {
   updated() {}, //生命周期 - 更新之后
   beforeDestroy() {}, //生命周期 - 销毁之前
   destroyed() {}, //生命周期 - 销毁完成
-  activated() {} //如果页面有keep-alive缓存功能，这个函数会触发
+  activated() {}, //如果页面有keep-alive缓存功能，这个函数会触发
 };
 </script>
 <style >
@@ -82,7 +110,6 @@ body {
 }
 .my {
   width: 100vw;
-  height: 100vh;
   background: #fbfcfe;
   display: flex;
   flex-direction: column;
@@ -125,7 +152,7 @@ body {
 .my_order_chlid {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-around;
   margin-bottom: 30px;
 }
 .my_order_chlid > div {

@@ -10,6 +10,8 @@ import Login from '@/views/login'
 import OrderEdit from '@/views/order/order-edit'
 import Supplier from '@/views/my/supplier'
 import Machine from '@/views/login/machine'
+import Agent from '@/views/my/agent'
+
 
 
 
@@ -27,7 +29,10 @@ export default new Router({
   routes: [{
       path: '/home',
       name: 'home',
-      component: Home
+      component: Home,
+      meta:{
+        keepAlive:true
+      }
     },
     {
       path: '/login',
@@ -39,6 +44,12 @@ export default new Router({
       name: 'supplier',
       component: Supplier,
       title: "供应商管理"
+    },
+    {
+      path: '/agent',
+      name: 'agent',
+      component: Agent,
+      title: "我代理的订单"
     },
     {
       path: '/machine',

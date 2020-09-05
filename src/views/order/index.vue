@@ -2,7 +2,7 @@
   <div class="Order">
     <van-tabs v-model="active">
       <!-- :sticky="true" :offset-top="50" -->
-      <van-tab v-for="(item,index) in tabList" :key="index" :title="item.title" badge="1">
+      <van-tab v-for="(item,index) in tabList" :key="index" :title="item.title" :info="item.info">
         <div class="tabListChild">
           <div class="tabListChildEdit">
             <van-search v-model="value" placeholder="请输入搜索关键词" />
@@ -150,6 +150,7 @@ export default {
           pageNum: 1,
           finished: false,
           loading: true,
+          info:""
         },
         {
           title: "待确认",
@@ -158,6 +159,8 @@ export default {
           pageNum: 1,
           finished: true,
           loading: true,
+          info:""
+
         },
         {
           title: "待发货",
@@ -166,6 +169,8 @@ export default {
           pageNum: 1,
           finished: false,
           loading: true,
+          info:""
+
         },
         {
           title: "已发货",
@@ -174,6 +179,8 @@ export default {
           pageNum: 1,
           finished: false,
           loading: true,
+          info:""
+          
         },
         {
           title: "已签收",
@@ -182,6 +189,8 @@ export default {
           pageNum: 1,
           finished: false,
           loading: true,
+          info:""
+
         },
       ],
       tabValue: 0,

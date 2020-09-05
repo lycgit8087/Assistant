@@ -4,29 +4,33 @@
     <van-nav-bar left-arrow @click-left="backTo" title="代理商管理" :fixed="true" placeholder />
     <van-search v-model="searchValue" placeholder="请输入搜索关键词" />
 
-    <van-index-bar :index-list="indexList" >
-      <div v-for="(item,index) in list" :key="index"  >
-          <van-index-anchor :index="item.title" />
-      <van-swipe-cell v-for="(ditem,dindex) in item.data" :key="dindex" :before-close="beforeClose" :name="ditem.lid" >
-        <div class="mial_people">
-          <div class="mial_people_left">
-            <van-image fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
-            <div class="mial_people_left_des">
-              <p>
-                <span>{{ditem.name}}</span>
-                <span>（下单渠道数：{{ditem.link_count}}）</span>
-              </p>
-              <span>{{ditem.mobile}}</span>
+    <van-index-bar :index-list="indexList">
+      <div v-for="(item,index) in list" :key="index">
+        <van-index-anchor :index="item.title" />
+        <van-swipe-cell
+          v-for="(ditem,dindex) in item.data"
+          :key="dindex"
+          :before-close="beforeClose"
+          :name="ditem.lid"
+        >
+          <div class="mial_people">
+            <div class="mial_people_left">
+              <van-image fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
+              <div class="mial_people_left_des">
+                <p>
+                  <span>{{ditem.name}}</span>
+                  <span>（下单渠道数：{{ditem.link_count}}）</span>
+                </p>
+                <span>{{ditem.mobile}}</span>
+              </div>
             </div>
+            <p>{{ditem.rstatus==0?"未注册":"已注册"}}</p>
           </div>
-          <p>{{ditem.rstatus==0?"未注册":"已注册"}}</p>
-        </div>
-        <template #right>
-          <van-button square text="删除" type="danger" class="delete-button" />
-        </template>
-      </van-swipe-cell>
+          <template #right>
+            <van-button square text="删除" type="danger" class="delete-button" />
+          </template>
+        </van-swipe-cell>
       </div>
-      
     </van-index-bar>
 
     <div class="fix-btn">
@@ -64,12 +68,14 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-import {mixin} from "../../mixin/mixin"
+import { mixin } from "../../mixin/mixin";
+import util from "../../utils/util";
+
 export default {
   //import引入的组件需要注入到对象中才能使用
   name: "mail-list",
   components: {},
-   mixins:[mixin],
+  mixins: [mixin],
 
   data() {
     //这里存放数据
@@ -79,90 +85,131 @@ export default {
       username: "",
       ophone: "",
       searchValue: "",
-      list:[],
-      oldList:[],
-      indexList:[]
+      list: [],
+      oldList: [],
+      indexList: [],
     };
   },
   //监听属性 类似于data概念
   computed: {},
   //监控data中的数据变化
-  watch: {},
+  watch: {
+    searchValue(val) {
+      this.debounce(this);
+    },
+  },
   //方法集合
   methods: {
     // 获取列表
     getList() {
-      let { searchValue,indexList } = this;
+      let { searchValue, indexList } = this;
       this.$api.agent
         .list({
           is_link: 0,
           name: "",
         })
         .then((res) => {
-          indexList=[]
-          let {data}=res
-          data.forEach((item,index)=>{
-            item.first_letter=item.first_letter.toUpperCase()
-          })
-          let newData=this.$util.filter_identical(data,"first_letter")
-          let listData=newData.sort(this.$util.sortBy("title"))
-          listData.forEach((item)=>{
-            indexList.push(item.title)
-          })
-          this.indexList=indexList
-          this.list=listData
-
+          indexList = [];
+          let { data } = res;
+          data.forEach((item, index) => {
+            item.first_letter = item.first_letter.toUpperCase();
+          });
+          this.oldList=data
+         let listData=this.disposeData(data)
+          listData.forEach((item) => {
+            indexList.push(item.title);
+          });
+          this.indexList = indexList;
+          this.list = listData;
         });
+    },
+    // 处理列表数据
+    disposeData(data){
+       let newData = this.$util.filter_identical(data, "first_letter");
+      let listData = newData.sort(this.$util.sortBy("title"));
+      return listData
+    },
+
+
+    // 防抖
+    debounce: util.debounce((vm) => {// do something，这里this不指向Vue实例,用vm传入
+      vm.searchIt();
+      
+    }, 500),
+
+    // 搜索
+    searchIt() {
+      let { searchValue,list,oldList } = this;
+      if(searchValue.length){
+         list.forEach((item, index) => {
+            item.data = item.data.filter((ditem) => ditem.name.indexOf(searchValue)!=-1);
+          });
+          list=list.filter(item=>item.data.length!=0)
+          console.log(list)
+      }else{
+         list=this.disposeData(oldList)
+          console.log(list)
+      }
+     
+
+          this.list=list
+      
+      console.log(searchValue);
     },
 
     // 代理商添加
     onsubmit() {
       let { username, ophone } = this;
-      this.$api.agent.add({
-        name: username,
-        mobile: ophone,
-      }).then(res=>{
-       this.$Toast.success('添加成功');
-       this.getList()
-      });
+      this.$api.agent
+        .add({
+          name: username,
+          mobile: ophone,
+        })
+        .then((res) => {
+          this.$Toast.success("添加成功");
+          this.show=false
+          setTimeout(()=>{
+          this.getList();
+          },500)
+        });
     },
-
-    beforeClose({name,position,instance}){
-      
-      if(position=="right"){
-        this.$Dialog.confirm({
-            message: '确定删除吗？',
-          }).then(() => {
-            console.log(name)
-            this.del(name)
+    // 删除确认框
+    beforeClose({ name, position, instance }) {
+      if (position == "right") {
+        this.$Dialog
+          .confirm({
+            message: "确定删除吗？",
+          })
+          .then(() => {
+            this.del(name);
             instance.close();
           });
       }
     },
 
     // 删除代理商
-    del(lid){
-        let{list}=this
-        this.$api.agent.del({
-            lid:lid
-        }).then(res=>{
-            console.log(res)
-            list.forEach((item,index)=>{
-            item.data=item.data.filter(ditem=>ditem.lid!=lid)
-            })
+    del(lid) {
+      let { list } = this;
+      this.$api.agent
+        .del({
+          lid: lid,
         })
-        this.list=list
+        .then((res) => {
+          list.forEach((item, index) => {
+            item.data = item.data.filter((ditem) => ditem.lid != lid);
+          });
+        });
+      this.list = list;
     },
-    
 
     // 检测手机号码
     validator(val) {
       return /^[1][3,4,5,6,7,8,9][0-9]{9}$/.test(val);
     },
     // 检测用户名
-    regUserName(val){
-      return /^[\u4E00-\u9FA5]{2,4}$/.test(val)
-    }
+    regUserName(val) {
+      return /^[\u4E00-\u9FA5]{2,4}$/.test(val);
+    },
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
@@ -181,7 +228,10 @@ export default {
 </script>
 <style  scoped>
 /* //@import url(); 引入公共css类 */
-
+.mail-list{
+  padding-bottom: 100px;
+  box-sizing: border-box;
+}
 .mial_people {
   width: 100%;
   background: #fff;
@@ -275,12 +325,7 @@ export default {
   border-radius: 5px;
   margin-top: 57px;
 }
-.fix-btn {
-  position: fixed;
-  bottom: 3vh;
-  left: 50%;
-  transform: translate(-50%, 0);
-}
+
 .addbtn {
   width: 255px;
 }

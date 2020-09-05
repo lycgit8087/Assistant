@@ -35,12 +35,13 @@ export default {
   created() {
     let userInfo=this.$store.state.userInfo
     
-    this.$api.user.userInfo().then(res=>{
-      console.log(res)
-    })
+    
     console.log(userInfo)
     if(JSON.stringify(userInfo)=="{}"){
-      
+      this.$api.user.userInfo().then(res=>{
+      console.log(res)
+      this.$store.dispatch('USER_INFO',res.data)
+    })
     }
     
   },

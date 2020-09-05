@@ -40,6 +40,19 @@
     }
 }
 
+// 防抖函数		1.搜索功能   2.window触发resize的时候，不断的调整浏览器窗口大小会不断的触发这个事件，用防抖来让其只触发一次。
+
+ function debounce(fn, delay){
+  let timeout = null
+  return function(){
+    let args = arguments
+    if(timeout) window.clearTimeout(timeout)
+    timeout = setTimeout(() => {
+      fn.apply(this, args)
+    }, delay)
+  }
+}
+
 
 
 
@@ -48,5 +61,6 @@
     validator,
     cloneObject,
     sortBy,
-    smsValidator
+    smsValidator,
+    debounce
   };

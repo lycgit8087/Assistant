@@ -1,6 +1,9 @@
 <template>
   <div id="app">
-    <router-view />
+    <keep-alive>
+ <router-view v-if="$route.meta.keepAlive" class="app-middle-content"/>
+</keep-alive>
+<router-view v-if="!$route.meta.keepAlive" class="app-middle-content"/>
   </div>
 </template>
 
@@ -15,7 +18,7 @@ export default {
     let token = localStorage.getItem("token");
     if (token) {
           this.$router.push({name: 'home',});;
-      localStorage.setItem("token","T3lNOG1qWmtwVzNSSEtUTVRNWlhUQnRtdk1nb1QvM1BoaUxzRkhSVHM5NTF0SkJwT3VQSFR5YWh5OVhQR05vblhtWk5NSFNTOFpDTldhZ1dMRmRSeU5OOFJINFhJSWRCL0psV0d0cHA4VW5TcVhHckZXWmVvQlFRZktub2ZRK3ZCd0lpWnhxTEZMOW5zenJzVTdHdlNOU0o3QVFDTU9wcktoTmV6bU5pSVMxd2E2bjd3QTU1QXRlcXhlajZ4VFhXcG1acWQyb0VkZHltL0tkSW11cWpqTGlxN2VyT1hmb1NDTGFTa2dQellBN1Yrb1N1d2E2YmJIcDVNajI1QzBTdjl0MVBQUnZEMTZQeGVpdTV3aWtmVzBzaDByc1JwVTlMVWZPTTBGR1lTR29qOEF0a2xIMzhRMjhzL1NraXBIZFpSVXYzT1BtWEJxcVVxYmFEaGlzajBGRCtrcDBwRU9zKzd3ZmtETyt6WTI3cmpJUUlhYjd3cGNoL3E0OU9mc3BTNzFwajBSVStiVzBTM0R4UDR5azIxQ3pyYnpCVmhDOXczVDhPZ0FMMHZhYkdheXdkU1BjUXFVb3FWWkJlWEVnRms0VjFuc1MyOVNtTjk1aVZFWlpMQkNZcWltWDlTd25vN21pVUZRWXhxWkU9")
+      localStorage.setItem("token","T3lNOG1qWmtwVzNSSEtUTVRNWlhUQnRtdk1nb1QvM1BoaUxzRkhSVHM5NTF0SkJwT3VQSFR5YWh5OVhQR05vblhtWk5NSFNTOFpDTldhZ1dMRmRSeU5OOFJINFhJSWRCL0psV0d0cHA4VW5TcVhHckZXWmVvQlFRZktub2ZRK3ZCd0lpWnhxTEZMOW5zenJzVTdHdlNOU0o3QVFDTU9wcktoTmV6bU5pSVMxd2E2bjd3QTU1QXRlcXhlajZ4VFhXcG1acWQyb0VkZHltL0tkSW11cWpqTGlxN2VyT1hmb1NDTGFTa2dQellBN1Yrb1N1d2E2YmJIcDVNajI1QzBTdjl0MVBQUnZEMTZQeGVpdTV3aWtmVzBzaDByc1JwVTlMVWZPTTBGR1lTR29qOEF0a2xIMzhRMjhzL1NraXBIZFpSVXYzT1BtWEJxcVVxYmFEaGlzajBGRCtrcDBwRU9zKzd3ZmtETyt6WTI3cmpJUUlhYjd3cGNoL3E0OU9mc3BTNzFwajBSVStiVzBTM0R4UDR5azIxQ3pyYnpCVmhDOXczVDhPZ0FMMHZhYkdheXdkU1BjUXFVb3FWWkJlWEVnRms0VjFuc1MyOVNtTjk1aVZFWlpMQkE1dGpXVjg1ZG9DSit3cGpoUGhHMlU9")
     } else {
       //  window.location.href="https://sc.imofang.cn/cube.aspx?c=module&module_name=wse&show_mode=redirect&dt=gauth&lr=0"
       if (process.env.NODE_ENV == "development") {
@@ -61,11 +64,26 @@ body {
   padding: 0;
   margin: 0;
 }
+.f12{
+  font-size: 12px;
+}
+.f16{
+  font-size: 16px;
+}
 .van-image {
   overflow: hidden;
 }
 .mt10 {
   margin-top: 10px;
+}
+.mr10 {
+  margin-right: 10px;
+}
+.mr20{
+  margin-right: 20px;
+}
+.ml5{
+  margin-left: 5px;
 }
 .mt20 {
   margin-top: 20px;
@@ -97,5 +115,12 @@ body {
   width: 1px;
   /*高宽分别对应横竖滚动条的尺寸*/
   height: 1px;
+}
+
+.fix-btn {
+  position: fixed;
+  bottom: 3vh;
+  left: 50%;
+  transform: translate(-50%, 0);
 }
 </style>
