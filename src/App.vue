@@ -14,12 +14,16 @@ export default {
     return {};
   },
   created() {
-    let msg = "";
+    let msg = window.msg||{};
     let token = localStorage.getItem("token");
     if (token) {
-          this.$router.push({name: 'home',});;
-      localStorage.setItem("token","T3lNOG1qWmtwVzNSSEtUTVRNWlhUQnRtdk1nb1QvM1BoaUxzRkhSVHM5NTF0SkJwT3VQSFR5YWh5OVhQR05vblhtWk5NSFNTOFpDTldhZ1dMRmRSeU5OOFJINFhJSWRCL0psV0d0cHA4VW5TcVhHckZXWmVvQlFRZktub2ZRK3ZCd0lpWnhxTEZMOW5zenJzVTdHdlNOU0o3QVFDTU9wcktoTmV6bU5pSVMxd2E2bjd3QTU1QXRlcXhlajZ4VFhXcG1acWQyb0VkZHltL0tkSW11cWpqTGlxN2VyT1hmb1NDTGFTa2dQellBN1Yrb1N1d2E2YmJIcDVNajI1QzBTdjl0MVBQUnZEMTZQeGVpdTV3aWtmVzBzaDByc1JwVTlMVWZPTTBGR1lTR29qOEF0a2xIMzhRMjhzL1NraXBIZFpSVXYzT1BtWEJxcVVxYmFEaGlzajBGRCtrcDBwRU9zKzd3ZmtETyt6WTI3cmpJUUlhYjd3cGNoL3E0OU9mc3BTNzFwajBSVStiVzBTM0R4UDR5azIxQ3pyYnpCVmhDOXczVDhPZ0FMMHZhYkdheXdkU1BjUXFVb3FWWkJlWEVnRms0VjFuc1MyOVNtTjk1aVZFWlpMQkE1dGpXVjg1ZG9DSit3cGpoUGhHMlU9")
+      this.$router.push({name: 'home',});
+      localStorage.setItem("token","NHdFMXVBZFdVdGRpellYQVNPSTU2OU9HSFY1S21jMkYvNld5Ly9QeUpQVEJvSEdNbnpyWEtjNC8vZzFTUzkzR0ZOdjczU2hWc09OeGh1SjJCdjZmOFhYQnBhRDJ4Q0hIUk5pN2xFZnpUWlprRGdkWWFEQlBPbGplYjArTHBMamJzb1htbjlTbXJBUFRadnZYcHpRd1ZXZi95Q08vUXJwU3BtT3NYYVNYbTltajcvazh6VUhadU5QWVJNWTJPUjhreEVFbEJXNzFHY1ZqeVZnS2xpWmtTQzdXVVF2WDB1dmtNaDFwY3J3bGJnM2pKZVNPUHBQK1NYejQ4L3g5MUxlem4xRGN2WTJmVGlPYzViRFVYRkpCQURhL2dKcTF1TFFDSkpKcCtiVk1UeDMyM3l5THVqa0RRS3dKVXBJT05waW80OFNlMnJXYnRSWFIxMFVUcE1yK1ZMbmN3RmQ3UDQ2YkR3aXVnOTRwRVhPSEYxWXBEVzNaTmF0KzhoemZuN2d1UnBKVS9HTURpbUc1R1BUelZwSUtBL3hya1liUHNSdE5TanErNzcwRnYxdk9JOStwTEowU0ZncEY2TW5kckxCSmdyMVVBdWVyVzRHRnlZaGd2MHdrR2tvU0orN0h6ZE10eXBEb2phd1lSQ0E9")
+      let token_time= Date.parse("2020-09-07 17:50:40")
+      localStorage.setItem("token_time",token_time)
+    
     } else {
+
       //  window.location.href="https://sc.imofang.cn/cube.aspx?c=module&module_name=wse&show_mode=redirect&dt=gauth&lr=0"
       if (process.env.NODE_ENV == "development") {
         msg = {
@@ -32,7 +36,23 @@ export default {
           this.$router.push({name: 'login',});
         }
       } else {
-        msg = JSON.parse(window.msg);
+
+        if(JSON.stringify(msg)=="{}"){
+          console.log("初次登录")
+        window.location.href="https://ams.imofang.cn/cube.aspx?c=module&module_name=wse&show_mode=redirect&dt=gauth&lr=0&rpath="+window.location.href
+
+        }else{
+          console.log("二次登录")
+          console.log(msg)
+          msg = JSON.parse(msg);
+          console.log(msg)
+          localStorage.setItem("token",msg.token)
+          localStorage.setItem("token_time",msg.token_expires)
+          if(msg.mobile_bind==0){
+            this.$router.push({name: 'login',});
+          }
+
+        }
       }
     }
   },
