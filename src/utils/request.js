@@ -81,25 +81,21 @@ axios.interceptors.response.use(
       let now_time=Date.parse(new Date())
       let is_get_token=((token_time-now_time)/60000)>10
       if(!is_get_token&&token_time){
-          api.user.tokenUpdate(res=>{
-            console.log(res)
+          api.user.tokenUpdate().then(res=>{
+            localStorage.setItem("token",res.token)
+            localStorage.setItem("token_time",res.token_expires)
           })
       }
       if(response.data.response_code==-1){
         let errmessage = response.data.response_msg.toLowerCase()
         if(errmessage.indexOf("token")!=-1){
-          console.log(1111)
-          //   Notify({
-          //       message: response.data.response_msg,
-          //       type: 'warning',
-          //       duration: 3 * 1000
-          //     })
-          // localStorage.setItem("token", "");
-          // router.replace({ name: "login"});
-
-          api.user.tokenUpdate(res=>{
-            console.log(res)
-          })
+            Notify({
+                message: response.data.response_msg,
+                type: 'warning',
+                duration: 3 * 1000
+              })
+          localStorage.setItem("token", "");
+          router.replace({ name: "login"});
         }else{
           Notify({
             message: errmessage,

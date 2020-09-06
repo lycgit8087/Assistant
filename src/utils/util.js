@@ -14,8 +14,18 @@
     return new_result
   }
 
+  // 检测用户名
+ function userNameValidator(val) {
+    return /^[\u4E00-\u9FA5]{2,4}$/.test(val);
+  }
+
+  // 检测一位以上中文
+ function textValidator(val) {
+  return /[A-Za-z0-9]|[\u4e00-\u9fa5]|[\u4e00-\u9fa5][\w\W]/.test(val);
+}
+
 //   检测手机号码
- function validator(val) {
+ function phoneValidator(val) {
     return /^[1][3,4,5,6,7,8,9][0-9]{9}$/.test(val);
   }
 //   检测六位数验证码
@@ -58,9 +68,11 @@
 
   module.exports = {
     filter_identical,
-    validator,
+    phoneValidator,
     cloneObject,
+    userNameValidator,
     sortBy,
     smsValidator,
+    textValidator,
     debounce
   };

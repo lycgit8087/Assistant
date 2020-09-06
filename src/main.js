@@ -19,6 +19,10 @@ Vue.prototype.$Toast = Toast
 Vue.prototype.$Notify = Notify
 Vue.prototype.$Dialog = Dialog
 
+import Vconsole from 'vconsole'
+let vConsole = new Vconsole()
+Vue.use(vConsole)
+
 
 
 /* eslint-disable no-new */

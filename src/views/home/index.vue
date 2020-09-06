@@ -33,6 +33,8 @@ export default {
     };
   },
   created() {
+      // this.$api.user.tokenUpdate()
+
     let userInfo=this.$store.state.userInfo
     
     

@@ -21,7 +21,7 @@
     </div>
 
       <div class="fix-btn">
-      <van-button type="info" class="addbtn" @click="show=true">新增链接</van-button>
+      <van-button type="info" class="addbtn"  @click='toAddAgent' >新增链接</van-button>
     </div>
 
   </div>
@@ -75,6 +75,10 @@ export default {
       this.$api.user.tokenUpdate((res) => {
         console.log(res);
       });
+    },
+    toAddAgent(){
+      this.$router.push({ name: "order-edit" });
+
     },
   },
   //生命周期 - 创建完成（可以访问当前this实例）

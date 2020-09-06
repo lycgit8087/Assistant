@@ -42,8 +42,8 @@ export default {
     //这里存放数据
     return {
       myList: [
-        { title: "代理商管理", name: "mail-list", icon: "cluster-o" },
-        { title: "供应商管理", name: "supplier", icon: "points" },
+        { title: "代理商管理", name: "mail-list", icon: "cluster-o",type:"2" },
+        { title: "供应商管理", name: "supplier", icon: "points",type:"1" },
       ],
       orderList: [
         {
@@ -78,17 +78,22 @@ export default {
     },
     openIt(name) {
       this.$router.push({ name: name });
-
-      // this.$api.user.tokenUpdate(res=>{
-      //       console.log(res)
-      //     })
     },
   },
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created() {
+    let {identity}=this.$store.state.userInfo
+    let {orderList,myList}=this
+    orderList=identity==2?orderList.filter(item=>item.type==2||item.type==0):orderList.filter(item=>item.type<=identity)
+    myList=identity==2?myList.filter(item=>item.type==2):myList.filter(item=>item.type<=identity)
+    this.myList=myList
+    this.orderList=orderList
+
+
+
+  },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
-    console.log(this.$store.state.userInfo);
   },
   beforeCreate() {}, //生命周期 - 创建之前
   beforeMount() {}, //生命周期 - 挂载之前

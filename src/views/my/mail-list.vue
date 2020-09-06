@@ -24,7 +24,7 @@
                 <span>{{ditem.mobile}}</span>
               </div>
             </div>
-            <p>{{ditem.rstatus==0?"未注册":"已注册"}}</p>
+            <p :class="ditem.rstatus==0?'rclass':'gclass'" >{{ditem.rstatus==0?"未注册":"已注册"}}</p>
           </div>
           <template #right>
             <van-button square text="删除" type="danger" class="delete-button" />
@@ -114,8 +114,8 @@ export default {
           data.forEach((item, index) => {
             item.first_letter = item.first_letter.toUpperCase();
           });
-          this.oldList=data
-         let listData=this.disposeData(data)
+          this.oldList = data;
+          let listData = this.disposeData(data);
           listData.forEach((item) => {
             indexList.push(item.title);
           });
@@ -124,37 +124,32 @@ export default {
         });
     },
     // 处理列表数据
-    disposeData(data){
-       let newData = this.$util.filter_identical(data, "first_letter");
+    disposeData(data) {
+      let newData = this.$util.filter_identical(data, "first_letter");
       let listData = newData.sort(this.$util.sortBy("title"));
-      return listData
+      return listData;
     },
 
-
     // 防抖
-    debounce: util.debounce((vm) => {// do something，这里this不指向Vue实例,用vm传入
+    debounce: util.debounce((vm) => {
+      // do something，这里this不指向Vue实例,用vm传入
       vm.searchIt();
-      
     }, 500),
 
     // 搜索
     searchIt() {
-      let { searchValue,list,oldList } = this;
-      if(searchValue.length){
-         list.forEach((item, index) => {
-            item.data = item.data.filter((ditem) => ditem.name.indexOf(searchValue)!=-1);
-          });
-          list=list.filter(item=>item.data.length!=0)
-          console.log(list)
-      }else{
-         list=this.disposeData(oldList)
-          console.log(list)
+      let { searchValue, list, oldList } = this;
+      if (searchValue.length) {
+        list.forEach((item, index) => {
+          item.data = item.data.filter(
+            (ditem) => ditem.name.indexOf(searchValue) != -1
+          );
+        });
+        list = list.filter((item) => item.data.length != 0);
+      } else {
+        list = this.disposeData(oldList);
       }
-     
-
-          this.list=list
-      
-      console.log(searchValue);
+      this.list = list;
     },
 
     // 代理商添加
@@ -167,10 +162,10 @@ export default {
         })
         .then((res) => {
           this.$Toast.success("添加成功");
-          this.show=false
-          setTimeout(()=>{
-          this.getList();
-          },500)
+          this.show = false;
+          setTimeout(() => {
+            this.getList();
+          }, 500);
         });
     },
     // 删除确认框
@@ -228,7 +223,7 @@ export default {
 </script>
 <style  scoped>
 /* //@import url(); 引入公共css类 */
-.mail-list{
+.mail-list {
   padding-bottom: 100px;
   box-sizing: border-box;
 }
@@ -252,7 +247,13 @@ export default {
   color: #ffffff;
   padding: 5px 5px;
   box-sizing: border-box;
+}
+.gclass{
   background: #75c16d;
+}
+.rclass{
+  background: #E96960;
+
 }
 .mial_people_left {
   height: 100%;

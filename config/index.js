@@ -14,7 +14,7 @@ module.exports = {
     proxyTable: {
       '/api': {
         // target: 'https://wse.imofang.cn/app.aspx',//后端接口地址
-        target:"https://newaits.imofang.cn/app.aspx",
+        target:"https://network-modules.imofang.cn/app.aspx",
         changeOrigin: true,//是否允许跨越
         pathRewrite: {
             '^/api': '',//重写,
@@ -63,7 +63,7 @@ module.exports = {
     assetsPublicPath: './',
     proxyTable: {
       '/api': {
-        target: 'https://wse.imofang.cn/app.aspx',//后端接口地址
+        target: 'https://network-modules.imofang.cn/app.aspx',//后端接口地址
         changeOrigin: true,//是否允许跨越
         pathRewrite: {
             '^/api': '',//重写,
