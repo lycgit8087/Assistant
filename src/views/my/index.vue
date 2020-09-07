@@ -1,7 +1,7 @@
 <!-- My -->
 <template>
   <div class="my">
-    <div class="my_top">
+    <div class="my_top" @click="toPlace" > 
       <van-image fit="cover" :src="this.$store.state.userInfo.avatar" />
       <span>{{this.$store.state.userInfo.name}}</span>
     </div>
@@ -78,6 +78,11 @@ export default {
     },
     openIt(name) {
       this.$router.push({ name: name });
+    },
+    toPlace(){
+      this.$router.push({ name: "order-edit" });
+
+      
     },
   },
   //生命周期 - 创建完成（可以访问当前this实例）

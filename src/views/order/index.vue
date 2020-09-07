@@ -1,46 +1,59 @@
 <template>
   <div class="Order">
-    <van-tabs v-model="active">
+    <van-tabs v-model="active" @change="changeActive">
       <!-- :sticky="true" :offset-top="50" -->
       <van-tab v-for="(item,index) in tabList" :key="index" :title="item.title" :info="item.info">
         <div class="tabListChild">
           <div class="tabListChildEdit">
-            <van-search v-model="value" placeholder="请输入搜索关键词" />
-            <p class="tabListChildFiler">
+            <van-search v-model="keyword" placeholder="请输入搜索关键词" />
+            <p class="tabListChildFiler" @click="peopleToggle">
               <span>筛选</span>
               <van-icon name="filter-o" color="#FFA726" />
             </p>
             <van-button type="info" size="small" @click="popupToggle">批量操作</van-button>
           </div>
-          <van-pull-refresh v-model="refreshing" @refresh="onRefresh" style="width:100%">
+          <van-pull-refresh
+            class="refresh-class"
+            v-model="item.refreshing"
+            @refresh="onRefresh"
+            style="width:100%"
+          >
             <van-list
               v-model="item.loading"
               :finished="item.finished"
               finished-text="没有更多了"
               @load="onLoad"
+              v-if="item.listData.length!=0"
             >
               <div class="listParent">
-                <div class="listChild" @click="to_detail">
+                <div
+                  class="listChild"
+                  @click="to_detail(litem.orderid)"
+                  v-for="(litem,index) in item.listData"
+                  :key="index"
+                >
                   <div class="listChildTop">
-                    <p>高山铁观音新茶安溪铁观音茶叶清香型500g礼盒装</p>
-                    <span>待确认</span>
+                    <p>{{litem.goods}}</p>
+                    <span :style="'color:'+litem.colorText">{{litem.status_text}}</span>
                   </div>
                   <div class="listChildTime">
-                    <p>下单时间：2020/08/16 09:35</p>
+                    <p>下单时间：{{litem.time}}</p>
                   </div>
                   <div class="listChildDes">
                     <div class="listChildDesLeft">
-                      <p>
-                        <van-icon name="https://b.yzcdn.cn/vant/icon-demo-1126.png" />
-                        <span>王要疯疯</span>
+                      <p v-if="litem.uname">
+                        <van-icon :name="litem.uavatar" />
+                        <span>{{litem.uname}}</span>
                       </p>
-                      <span>王耀峰的订单</span>
+                      <span>{{litem.name}}的订单</span>
                     </div>
                     <div class="listChildDesRight"></div>
                   </div>
                 </div>
               </div>
             </van-list>
+
+            <van-empty v-if="!isloading&&item.listData.length==0" description="暂无此类数据" />
           </van-pull-refresh>
         </div>
       </van-tab>
@@ -54,19 +67,20 @@
 
         <div class="checkall">
           <van-button round type="info" size="mini">全选</van-button>
-          <p>已选择2个订单</p>
+          <p>已选择{{checkOrder}}个订单</p>
         </div>
         <div class="popuplistView">
           <van-list>
-            <div class="popupView_child" v-for="(item,index) in 9" :key="index">
+            <div class="popupView_child" v-for="(item,index) in decidedList" :key="index">
               <div class="listChildTop">
-                <p>高山铁观音新茶安溪铁观音茶叶清香型500g礼盒装</p>
+                <p>{{item.goods}}</p>
                 <span>待确认</span>
               </div>
               <div class="listChildTime">
-                <p>下单时间：2020/08/16 09:35</p>
-                <!-- <van-icon name="passed"  size="20"/> -->
-                <van-icon name="checked" color="#E96960" size="20" />
+                <p>下单时间：{{item.time}}</p>
+                <van-icon v-if="item.is_sure" name="checked" color="#E96960" size="20" />
+
+                <van-icon v-else name="passed" size="20" />
               </div>
             </div>
           </van-list>
@@ -74,7 +88,7 @@
 
         <!-- 底部操作按钮 -->
         <div class="popupfooter">
-          <van-button type="info" class="sureclass" @click="peopleToggle">选择供应商</van-button>
+          <van-button type="info" class="sureclass">确定</van-button>
           <van-button type="danger" class="deleclass">删除</van-button>
         </div>
       </div>
@@ -87,7 +101,7 @@
         <!-- 搜索按钮 -->
         <van-search class="poeple_search" v-model="peoplesearch" placeholder="请输入搜索关键词" />
         <div class="allpeople">
-          <div class="allpeoplechild" v-for="item in 3" :key="item" >
+          <div class="allpeoplechild" v-for="item in 3" :key="item">
             <van-image fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
             <div class="allpeoplechild_right">
               <p class="allpeoplechild_right_des">
@@ -96,9 +110,9 @@
               </p>
               <!-- 下单链接 -->
               <van-cell-group>
-                <van-cell title="下单渠道名称02"  >
+                <van-cell title="下单渠道名称02">
                   <template #right-icon>
-                    <div class="iconview" >
+                    <div class="iconview">
                       <van-icon name="search" class="search=icon" />
                     </div>
                   </template>
@@ -106,13 +120,11 @@
 
                 <van-cell title="下单渠道名称02">
                   <template #right-icon>
-                    <div class="iconview" >
+                    <div class="iconview">
                       <van-icon name="search" class="search=icon" />
                     </div>
-                    
                   </template>
                 </van-cell>
-                
               </van-cell-group>
             </div>
           </div>
@@ -132,92 +144,180 @@ export default {
       msg: "Welcome to Your Vue.js App",
       date: "",
       popupShow: false,
-      value: "",
+      keyword: "",
       active: 0,
       peoplesearch: "",
-      refreshing: false,
+      isloading:false,
       type_arr: [
-        { text: "待确定", color: "#E96960", type: 0 },
-        { text: "待发货", color: "#FFA726", type: 0 },
-        { text: "已发货", color: "#E96960", type: 0 },
-        { text: "待确定", color: "#75C16D", type: 0 },
+        { text: "待确认", color: "#E96960", type: 0 },
+        { text: "待发货", color: "#FFA726", type: 1 },
+        { text: "已发货", color: "#E96960", type: 2 },
+        { text: "已签收", color: "#75C16D", type: 3 },
       ],
       tabList: [
         {
           title: "全部",
-          type: 0,
+          type: "0,1,2,3",
           listData: [],
           pageNum: 1,
           finished: false,
           loading: true,
-          info:""
+          info: "",
+          refreshing: false,
         },
         {
           title: "待确认",
-          type: 0,
+          type: "0",
           listData: [],
           pageNum: 1,
           finished: true,
           loading: true,
-          info:""
-
+          info: "",
+          refreshing: false,
         },
         {
           title: "待发货",
-          type: 0,
+          type: "1",
           listData: [],
           pageNum: 1,
           finished: false,
           loading: true,
-          info:""
-
+          info: "",
+          refreshing: false,
         },
         {
           title: "已发货",
-          type: 0,
+          type: "2",
           listData: [],
           pageNum: 1,
           finished: false,
           loading: true,
-          info:""
-          
+          info: "",
+          refreshing: false,
         },
         {
           title: "已签收",
-          type: 0,
+          type: "3",
           listData: [],
           pageNum: 1,
           finished: false,
           loading: true,
-          info:""
-
+          info: "",
+          refreshing: false,
         },
       ],
       tabValue: 0,
       peopleShow: false,
+      decidedList: [], //待确定列表
+      decidedPageNum: 1,
     };
   },
-  created(){
+  created() {
+    this.getList();
+  },
+  computed: {
+    checkOrder() {
+      return this.decidedList.length;
+    },
   },
   methods: {
     formatDate(date) {
       return `${date.getMonth() + 1}/${date.getDate()}`;
     },
-    onLoad() {},
+
+    // 切换tab
+    changeActive() {
+      this.getList();
+    },
+
+    // 订单列表
+    getList() {
+      let { keyword, tabList, active, type_arr } = this;
+      this.isloading=true
+      this.$api.order
+        .list({
+          keyword: keyword,
+          status: tabList[active].type,
+          page: tabList[active].pageNum,
+        })
+        .then((res) => {
+          let list = res.data;
+          list.forEach((item) => {
+            let num = type_arr.findIndex((titem) => titem.type == status);
+            item.colorText = type_arr[num].color;
+          });
+          this.tabList[active].listData = list;
+          this.tabList[active].refreshing = false;
+          if (list.length < 10) {
+            this.tabList[active].finished = true;
+          }
+          this.isloading=false
+        });
+    },
+
+    // 加载更多
+    onLoad() {
+      let { keyword, tabList, active, type_arr } = this;
+      this.tabList[active].pageNum = tabList[active].pageNum + 1;
+      this.getList();
+    },
+    // 下拉刷新
+    onRefresh() {
+      let { keyword, tabList, active, type_arr } = this;
+      this.tabList[active].pageNum = 1;
+      this.getList();
+    },
+
+    // 获取确定订单
+    getSureList() {
+      let { decidedList, decidedPageNum } = this;
+      this.$api.order
+        .list({
+          status: 0,
+          page: decidedPageNum,
+        })
+        .then((res) => {
+          let list = res.data;
+          list.forEach((item) => {
+            item.is_sure = false;
+          });
+          this.decidedList = [...decidedList, ...list];
+          console.log(res);
+        });
+    },
+
+    //确认订单
+    setSure() {
+      let { decidedList } = this;
+      let orderArr = decidedList.filter((item) => item.is_sure == true);
+      let orderId = orderArr.map((item) => item.orderid);
+      this.$api.order.edit({
+        type: 1,
+        orderid: orderId.join(","),
+      });
+    },
+    // 批量确定弹出框显示
     popupToggle() {
       let { popupShow } = this;
+      console.log(popupShow);
+      if (!popupShow) {
+        this.getSureList();
+      }
       this.popupShow = !popupShow;
     },
-    to_detail() {
+
+    // 跳转订单详情
+    to_detail(orderid) {
       this.$router.push({
         name: "order-detail",
+        query: { orderid: orderid },
       });
     },
 
+    //筛选
     peopleToggle() {
       this.peopleShow = !this.peopleShow;
     },
-    onRefresh() {},
   },
 };
 </script>
@@ -302,7 +402,6 @@ export default {
 .listChildTop > span {
   font-size: 12px;
   font-weight: 400;
-  color: #e96960;
 }
 .listChildTime {
   display: flex;
@@ -370,6 +469,9 @@ export default {
   padding: 15px;
   box-sizing: border-box;
   margin-top: 20px;
+}
+.refresh-class {
+  height: 100%;
 }
 .checkall {
   display: flex;
@@ -451,7 +553,7 @@ export default {
   font-weight: 600;
   color: #707070;
 }
-.cellclass{
+.cellclass {
   display: flex;
   align-items: center;
   height: 100%;

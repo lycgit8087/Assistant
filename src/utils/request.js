@@ -18,6 +18,7 @@ axios.interceptors.request.use(
         loadingInstance=  Toast.loading({
             message: '加载中...',
             forbidClick: true,
+            duration:0
           })
     }
     requestCount++
@@ -76,7 +77,6 @@ function tryHideLoading() {
 axios.interceptors.response.use(
   response => {
       let {config}=response
-      tryHideLoading()
       const token_time = parseInt(localStorage.getItem("token_time")) ;
       let now_time=Date.parse(new Date())
       let is_get_token=((token_time-now_time)/60000)>10
@@ -104,6 +104,8 @@ axios.interceptors.response.use(
           })
         }      
       }
+      tryHideLoading()
+
     return response.data;
   },
   error => {

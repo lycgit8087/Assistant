@@ -5,36 +5,29 @@
 
     <div class="detail_top">
       <div class="detail_top_des">
-        <p>佰儒 2020特级新茶安溪铁观音茶叶 1包</p>
-        <span>已发货</span>
+        <p>{{goods}}</p>
+        <span>{{status_text}}</span>
       </div>
       <p class="detail_top_time">下单时间：2020/08/16 09:35</p>
     </div>
 
     <!-- 留言 -->
-    <van-field v-model="message" rows="1" autosize label="留言" type="textarea" placeholder="请输入留言" />
+    <van-field v-model="message" border rows="1" autosize label="留言" placeholder="留言信息" type="textarea" />
     <div class="people_des">
       <!-- 收件人信息 -->
-      <van-field v-model="name" label="收件人" placeholder="请输入留言" />
-      <van-field v-model="phone" label="联系方式" placeholder="请输入留言" />
+      <van-field v-model="name"  label="收件人" readonly  />
+      <van-field v-model="phone"  label="联系方式" readonly  />
       <van-field
         v-model="place"
         rows="2"
         autosize
         label="收货地址"
         type="textarea"
-        maxlength="50"
-        placeholder="请输入留言"
+        readonly 
         show-word-limit
       />
     </div>
-<van-field
-    v-model="qrcode"
-    clearable
-    label="快递单号"
-    placeholder="快递单号"
-    right-icon="scan"
-    />
+    <van-field  v-model="qrcode" clearable label="快递单号" placeholder="快递单号" right-icon="scan" />
     <!-- 物流信息 -->
     <van-steps direction="vertical" :active="0">
       <van-step>
@@ -56,21 +49,30 @@
 <script>
 //这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 //例如：import 《组件名称》 from '《组件路径》';
-import {mixin} from "../../mixin/mixin"
+import { mixin } from "../../mixin/mixin";
 
 export default {
   //import引入的组件需要注入到对象中才能使用
   name: "order-detail",
   components: {},
-   mixins:[mixin],
+  mixins: [mixin],
   data() {
     //这里存放数据
     return {
-      message: "",
-      place: "",
-      name: "",
+      message: "", //留言
+      place: "", //收件人地址
+      name: "", //收件人名字
       phone: "",
       qrcode: "",
+      orderid: 0, //商品ID
+      goods: "", //商品描述
+      status_text: "", //订单状态
+      type_arr: [
+        { text: "待确认", color: "#E96960", type: 0 },
+        { text: "待发货", color: "#FFA726", type: 1 },
+        { text: "已发货", color: "#E96960", type: 2 },
+        { text: "已签收", color: "#75C16D", type: 3 },
+      ],
     };
   },
   //监听属性 类似于data概念
@@ -78,9 +80,34 @@ export default {
   //监控data中的数据变化
   watch: {},
   //方法集合
-  methods: {},
+  methods: {
+    getDetail() {
+      let { orderid, type_arr } = this;
+      this.$api.order
+        .detail({
+          orderid: orderid,
+        })
+        .then((res) => {
+          let detail = res.data;
+          this.name = detail.name;
+          this.place = detail.address;
+          this.status_text = detail.status_text;
+          this.phone = detail.mobile;
+          this.message = detail.notes;
+          this.goods = detail.goods;
+          // let num =type_arr.findIndex(item=>item.)
+          // this.color=type_arr
+
+          console.log(detail);
+        });
+    },
+  },
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created() {
+    this.orderid = this.$route.query.orderid;
+    this.getDetail();
+  },
+
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},
   beforeCreate() {}, //生命周期 - 创建之前
@@ -116,6 +143,10 @@ html {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 5px;
+}
+.dis-class{
+  color: #202020;
+  font-size: 14px;
 }
 .detail_top_des > p {
   width: 60vw;

@@ -27,7 +27,7 @@
             <p :class="ditem.rstatus==0?'rclass':'gclass'" >{{ditem.rstatus==0?"未注册":"已注册"}}</p>
           </div>
           <template #right>
-            <van-button square text="删除" type="danger" class="delete-button" />
+            <van-button @click="setBtnType(0)" square text="删除" type="danger" class="delete-button" /><van-button @click="setBtnType(1)" square type="primary" text="编辑" />
           </template>
         </van-swipe-cell>
       </div>
@@ -53,7 +53,7 @@
           <van-field
             :maxlength="11"
             :rules="[{ validator, message: '请输入11位有效手机号码' }]"
-            v-model="ophone"
+            v-model="phone"
             class="field-no-padding"
             :border="false"
             placeholder="请输入手机号码"
@@ -83,11 +83,13 @@ export default {
       value: "",
       show: false,
       username: "",
-      ophone: "",
+      phone: "",
       searchValue: "",
       list: [],
       oldList: [],
       indexList: [],
+      btnType:0,
+      editLid:0
     };
   },
   //监听属性 类似于data概念
@@ -154,11 +156,21 @@ export default {
 
     // 代理商添加
     onsubmit() {
-      let { username, ophone } = this;
+      let {editLid}=this
+      if(editLid==0){
+          this.addAgent()
+      }else{
+          this.editAgent()
+      }
+      
+    },
+    // 添加代理商
+    addAgent(){
+      let { username, phone } = this;
       this.$api.agent
         .add({
           name: username,
-          mobile: ophone,
+          mobile: phone,
         })
         .then((res) => {
           this.$Toast.success("添加成功");
@@ -168,18 +180,68 @@ export default {
           }, 500);
         });
     },
+
+    // 编辑代理商
+    editAgent(){
+      let { username, phone,editLid } = this;
+      this.$api.agent
+        .edit({
+          lid:editLid,
+          name: username,
+          mobile: phone,
+        })
+        .then((res) => {
+          this.$Toast.success("编辑成功");
+          this.show = false;
+          this.editLid=0
+          setTimeout(() => {
+            this.getList();
+          }, 500);
+        });
+    },
+
     // 删除确认框
     beforeClose({ name, position, instance }) {
+      let {btnType}=this
       if (position == "right") {
-        this.$Dialog
+        console.log(btnType)
+        if(btnType==0){
+           this.$Dialog
           .confirm({
             message: "确定删除吗？",
           })
           .then(() => {
-            this.del(name);
             instance.close();
+          }).catch(()=>{
+            instance.close();
+            
           });
+        }else{
+          this.editPeople(name)
+          instance.close();
+        }
+       
       }
+    },
+    // 编辑代理商
+    editPeople(editLid){
+      let {list}=this
+      this.editLid=editLid
+
+      this.show=true
+      let people={}
+      list.forEach((item, index) => {
+            people= item.data.filter((ditem) => ditem.lid == editLid);
+          });
+      people=people[0]
+          console.log(people)
+          this.username=people.name
+          this.phone=people.mobile
+
+    },
+
+    setBtnType(type){
+      this.btnType=type
     },
 
     // 删除代理商

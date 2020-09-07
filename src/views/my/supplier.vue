@@ -19,7 +19,8 @@
                 <van-cell title="下单渠道名称02"  >
                   <template #right-icon>
                     <div class="iconview" >
-                      <van-icon name="search" class="search=icon" />
+                      <van-icon name="share" />
+                      <span>分享</span>
                     </div>
                   </template>
                 </van-cell>
@@ -27,7 +28,8 @@
                 <van-cell title="下单渠道名称02">
                   <template #right-icon>
                     <div class="iconview" >
-                      <van-icon name="search" class="search=icon" />
+                     <van-icon name="share" />
+                      <span>分享</span>
                     </div>
                   </template>
                 </van-cell>
@@ -157,5 +159,13 @@ html{
   display: flex;
   align-items: center;
   height: 100%;
+}
+.iconview{
+  display: flex;
+  align-items: center;
+font-size: 12px;
+font-weight: 600;
+color: #9798A8;
+
 }
 </style>

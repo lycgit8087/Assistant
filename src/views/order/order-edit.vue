@@ -78,8 +78,8 @@
       </div>
 
       
-      <van-popup v-model="showArea" position="bottom">
-        <van-area :area-list="areaList" @confirm="onConfirm" @cancel="showArea = false" />
+      <van-popup v-model="showArea"  position="bottom">
+        <van-area :area-list="areaList" @confirm="onConfirm" :value="defaultPlace" @cancel="showArea = false" />
       </van-popup>
 
       <div style="margin: 16px;">
@@ -109,6 +109,7 @@ export default {
       red_icon: require("../../assets/images/required.png"),
       showArea:false,
       areaList: AreaList,
+      defaultPlace:"",
       placeText:"",
       shopname:"",
       placeDetail:""
@@ -136,6 +137,22 @@ export default {
       this.showArea = false;
     },
 
+    // 切换地址显示
+    placeToggle(){
+      let {placeShow}=this
+      this.placeShow=!placeShow
+    },
+
+    // 确定地址
+    confirmPlace(e){
+      console.log(e)
+    },
+
+    // 取消地址
+    cancelPlace(e){
+      console.log(e)
+    },
+
     // 添加下单链接
     addAgent() {
       let {ltag,placeDetail,shopname,placeText,username,phone,areaValue}=this
@@ -155,6 +172,16 @@ export default {
         text:placeText
       }).then(res=>{
         console.log(res)
+        if(res.data.length){
+           let placeData=res.data[0]
+            this.phone=placeData.mobile
+            this.placeDetail=placeData.detail
+            this.username=placeData.name
+            this.message=placeData.notes
+            this.defaultPlace=`${placeData.province_code},${placeData.city_code},${placeData.area_name}`
+            this.areaValue=`${placeData.province_name},${placeData.city_name},${placeData.area_name}`
+
+        }
       })
 
     },

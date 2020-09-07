@@ -36,12 +36,16 @@ export default {
       // this.$api.user.tokenUpdate()
 
     let userInfo=this.$store.state.userInfo
-    
-    
+    let url=this.getParam("https://ams.imofang.cn/cube.aspx?c=mp&module_name=wse&lr=0&at=sure_authorize&oc_id=w_1599445035388&mp_ui=%2fG02NSskKOXZu6OKoAj8oqADq6g0g8NJip74SFdmp0799JoE3J3snw9ccsxdGRxNKF9N1eZjGNMk6b8V%2fo3hSg%3d%3d")
+    console.log(url)
     console.log(userInfo)
     if(JSON.stringify(userInfo)=="{}"){
       this.$api.user.userInfo().then(res=>{
-      console.log(res)
+      console.log(res.data)
+      if(res.data.mobile_bind==0){
+          this.$router.push({ name: "login" });
+
+      }
       this.$store.dispatch('USER_INFO',res.data)
     })
     }
@@ -51,6 +55,11 @@ export default {
     
   },
   methods: {
+
+    getParam (paramName) { 
+    return decodeURIComponent((new RegExp('[?|&]' +
+      paramName + '=' + '([^&;]+?)(&|#|;|$)').exec(location.href) || [, ""])[1].replace(/\+/g, '%20')) || null
+}
   }
 };
 </script>
