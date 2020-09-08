@@ -42,7 +42,6 @@ export default {
       this.$store.dispatch('USER_INFO',res.data)
     })
     }
-
     
   },
   mounted(){
