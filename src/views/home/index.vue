@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <van-nav-bar :title="tabValue==0?'我代理的订单':'我的'" :fixed="true" placeholder />
+    <van-nav-bar :title="tabValue==0?'订单':'我的'" :fixed="true" placeholder />
     <!-- 订单 -->
     <template v-if="tabValue==0">
      <Order></Order>
@@ -10,7 +10,7 @@
         <My></My>
     </template>
     <!-- 固定标签 -->
-    <van-tabbar v-model="tabValue">
+    <van-tabbar v-model="tabValue" v-if="this.$store.state.userInfo.identity!=0" >
       <van-tabbar-item icon="bars">订单</van-tabbar-item>
       <van-tabbar-item icon="manager">我的</van-tabbar-item>
     </van-tabbar>

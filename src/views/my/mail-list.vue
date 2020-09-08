@@ -36,7 +36,7 @@
     <div class="fix-btn">
       <van-button type="info" class="addbtn" @click="show=true">添加代理商</van-button>
     </div>
-    <van-popup v-model="show" closeable>
+    <van-popup v-model="show" closeable @close="closePopup">
       <div class="addpeople flex-align-center">
         <van-form validate-first @submit="onsubmit">
           <p class="add-people-title">添加代理商</p>
@@ -163,6 +163,14 @@ export default {
           this.editAgent()
       }
       
+    },
+    // 关闭弹出框
+
+    closePopup(){
+        this.username=""
+        this.phone=""
+        this.editLid=0
+
     },
     // 添加代理商
     addAgent(){

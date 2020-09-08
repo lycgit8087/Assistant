@@ -11,6 +11,8 @@ import util from './utils/util.js'
 
 import store from "./store"
 import { Toast, Notify, Dialog} from "vant";
+import Vconsole from 'vconsole'
+
 Vue.use(Vant);
 Vue.prototype.$api = api
 Vue.prototype.$util = util
@@ -19,9 +21,11 @@ Vue.prototype.$Toast = Toast
 Vue.prototype.$Notify = Notify
 Vue.prototype.$Dialog = Dialog
 
-// import Vconsole from 'vconsole'
-// let vConsole = new Vconsole()
-// Vue.use(vConsole)
+if(process.env.NODE_ENV != "development"){
+  let vConsole = new Vconsole()
+  Vue.use(vConsole)
+}
+
 
 
 

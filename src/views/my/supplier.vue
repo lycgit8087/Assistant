@@ -7,28 +7,18 @@
         <!-- 搜索按钮 -->
         <van-search class="poeple_search" v-model="peoplesearch" placeholder="请输入搜索关键词" />
         <div class="allpeople">
-          <div class="allpeoplechild" v-for="item in 3" :key="item" >
-            <van-image fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
+          <div class="allpeoplechild" v-for="item in supplierList" :key="item" >
+            <van-image fit="cover" :src="item.avatar" />
             <div class="allpeoplechild_right">
               <p class="allpeoplechild_right_des">
-                <span>林有有</span>
-                <span>185 7876 5543</span>
+                <span>{{item.name}}</span>
               </p>
               <!-- 下单渠道 -->
               <van-cell-group>
-                <van-cell title="下单渠道名称02"  >
+                <van-cell :title="litem.name" v-for="(litem,lindex) in item.link_data" :key="lindex"  >
                   <template #right-icon>
                     <div class="iconview" >
                       <van-icon name="share" />
-                      <span>分享</span>
-                    </div>
-                  </template>
-                </van-cell>
-
-                <van-cell title="下单渠道名称02">
-                  <template #right-icon>
-                    <div class="iconview" >
-                     <van-icon name="share" />
                       <span>分享</span>
                     </div>
                   </template>
@@ -38,7 +28,7 @@
             </div>
           </div>
 
-          <van-button type="info">确定</van-button>
+          <!-- <van-button type="info">确定</van-button> -->
         </div>
       </div>
 
@@ -59,7 +49,8 @@ export default {
   data() {
     //这里存放数据
     return {
-      peoplesearch:""
+      peoplesearch:"",
+      supplierList:[]
 
     };
   },
@@ -76,9 +67,12 @@ export default {
   },
   //生命周期 - 创建完成（可以访问当前this实例）
   created() {
+      let {supplierList,peoplesearch}=this
       this.$api.supplier.list({
-        name:""
+        name:peoplesearch
       }).then(res=>{
+        let list=res.data
+        this.supplierList=list
         console.log(res)
       })
   },

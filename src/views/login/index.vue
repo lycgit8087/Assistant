@@ -139,29 +139,17 @@ export default {
     // 登录注册
     onsubmit() {
       let { phone, sms, identityNum, identity } = this;
-      // if (identityNum == -1) {
-      //   Notify({
-      //     message: "请选择您的身份",
-      //     type: "warning",
-      //     duration: 3 * 1000,
-      //   });
-      //   return;
-      // }
-      // utype: identity[identityNum].type,
-
       this.$api.user.userBind("user_bind", "/?c=api", {
         mobile: phone,
         vcode: sms,
       }).then((res) => {
         localStorage.setItem("token",res.token)
-        let token_time= Date.parse(res.token_expires)
+        let token_time= res.token_expires
         localStorage.setItem("token_time",token_time)
-        if(identity[identityNum].type==0){
+        if(res.identity==0){
           this.$router.push({name: 'home',});
-
         }else{
           this.$router.push({name: 'machine',});
-
         }
       });
     },

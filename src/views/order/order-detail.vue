@@ -33,7 +33,7 @@
 
     <!-- 快递公司 -->
 
-    <van-cell  title="顺风" icon="location-o" />
+    <van-cell v-if="exnumber"  title="顺风" icon="location-o" />
 
 
     <!-- 物流信息 -->
@@ -83,6 +83,7 @@ export default {
   //监控data中的数据变化
   watch: {
     exnumber(val){
+      
         this.expressMatching()
     }
   },

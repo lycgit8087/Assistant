@@ -131,7 +131,8 @@ axios.interceptors.response.use(
                 duration: 3 * 1000
               })
           localStorage.setItem("token", "");
-          router.replace({ name: "login"});
+          let indexUrl=localStorage.getItem("indexUrl")
+          window.location.href=indexUrl
         }else{
           Notify({
             message: errmessage,

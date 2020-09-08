@@ -1,7 +1,8 @@
 <template>
   <div class="Order">
-    <van-tabs v-model="active" @change="changeActive">
-      <!-- :sticky="true" :offset-top="50" -->
+    <!-- :sticky="true" :offset-top="45" -->
+    <van-tabs v-model="active" @change="changeActive" >
+      
       <van-tab v-for="(item,index) in tabList" :key="index" :title="item.title" :info="item.info">
         <div class="tabListChild">
           <div class="tabListChildEdit">
@@ -107,24 +108,16 @@
         <!-- 搜索按钮 -->
         <van-search class="poeple_search" v-model="peoplesearch" placeholder="请输入搜索关键词" />
         <div class="allpeople">
-          <div class="allpeoplechild" v-for="item in 3" :key="item">
-            <van-image fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
+          <div class="allpeoplechild" v-for="item in peopleList" :key="item">
+            <van-image fit="cover" :src="item.avatar" />
             <div class="allpeoplechild_right">
               <p class="allpeoplechild_right_des">
-                <span>林有有</span>
-                <span>185 7876 5543</span>
+                <span>{{item.name}}</span>
+                <span>{{item.mobile}}</span>
               </p>
               <!-- 下单链接 -->
               <van-cell-group>
-                <van-cell title="下单渠道名称02">
-                  <template #right-icon>
-                    <div class="iconview">
-                      <van-icon name="search" class="search=icon" />
-                    </div>
-                  </template>
-                </van-cell>
-
-                <van-cell title="下单渠道名称02">
+                <van-cell :title="litem.name" v-for="(litem,lindex) in item.link_data" :key="lindex" >
                   <template #right-icon>
                     <div class="iconview">
                       <van-icon name="search" class="search=icon" />
@@ -218,6 +211,8 @@ export default {
       peopleShow: false,
       decidedList: [], //待确定列表
       decidedPageNum: 1,
+      agetnName:"",//代理商名称
+      peopleList:[]//筛选列表
     };
   },
   created() {
@@ -260,6 +255,20 @@ export default {
       if (tabList[active].listData.length == 0) {
         this.getList();
       }
+    },
+
+    // 获取代理商列表
+    getAgentDetail(){
+      let {agetnName,peopleList}=this
+      this.$api.agent.list({
+        is_link:1,
+        name:agetnName
+      }).then(res=>{
+        let list=res.data
+        peopleList=[]
+        this.peopleList=list
+        console.log(res)
+      })
     },
 
     // 订单列表
@@ -337,6 +346,10 @@ export default {
     setSure() {
       let { decidedList } = this;
       let orderArr = decidedList.filter((item) => item.is_sure == true);
+      if(orderArr.length==0){
+        this.$Toast('请选择待确定订单');
+        return
+      }
       let orderId = orderArr.map((item) => item.orderid);
       this.$api.order
         .edit({
@@ -344,7 +357,6 @@ export default {
           orderid: orderId.join(","),
         })
         .then((res) => {
-          console.log(res);
           this.$Toast.success("已确认");
           this.decidedPageNum = 1;
           this.getSureList();
@@ -354,6 +366,10 @@ export default {
     delOrder() {
       let { decidedList } = this;
       let orderArr = decidedList.filter((item) => item.is_sure == true);
+      if(orderArr.length==0){
+        this.$Toast('请选择待确定订单');
+        return
+      }
       let orderId = orderArr.map((item) => item.orderid);
 
       this.$Dialog
@@ -395,6 +411,7 @@ export default {
     //筛选
     peopleToggle() {
       this.peopleShow = !this.peopleShow;
+      this.getAgentDetail()
     },
   },
 };
@@ -582,7 +599,7 @@ export default {
 }
 .pview {
   width: 100%;
-  height: 590px;
+  max-height: 590px;
   display: flex;
   flex-direction: column;
   padding: 15px;
@@ -599,7 +616,7 @@ export default {
   margin-bottom: 20px;
 }
 .listsearch {
-  width: 200px;
+  flex: 1;
   padding-left: 0;
   padding-right: 0;
 }
