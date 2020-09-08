@@ -287,8 +287,11 @@ export default {
             let num = type_arr.findIndex((titem) => titem.type == status);
             item.colorText = type_arr[num].color;
           });
-          this.tabList[active].listData = list;
+          if(tabList[active].pageNum==1)tabList[active].listData=[]
+          this.tabList[active].listData =[...tabList[active].listData,...list];
           this.tabList[active].refreshing = false;
+          this.tabList[active].info=this.tabList[active].listData.length==0?'':this.tabList[active].listData.length
+
           if (list.length < 10) {
             this.tabList[active].finished = true;
           }

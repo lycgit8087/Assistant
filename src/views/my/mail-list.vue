@@ -12,8 +12,9 @@
           :key="dindex"
           :before-close="beforeClose"
           :name="ditem.lid"
+          
         >
-          <div class="mial_people">
+          <div class="mial_people" @click="toAgent(ditem.name)" >
             <div class="mial_people_left">
               <van-image fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
               <div class="mial_people_left_des">
@@ -130,6 +131,14 @@ export default {
       let newData = this.$util.filter_identical(data, "first_letter");
       let listData = newData.sort(this.$util.sortBy("title"));
       return listData;
+    },
+
+    toAgent(position){
+      console.log(position)
+      if(position=="cell"){
+      this.$router.push({ name: "agent" });
+
+      }
     },
 
     // 防抖

@@ -7,14 +7,14 @@
       <div class="agentListChild">
         <div class="agentListChildLeft flex-align-center">
           <p class="mr10 f16">王耀峰的订单</p>
-          <van-icon name="edit" />
+          <van-icon name="edit" size="15"  />
         </div>
         <div class="agentListChildRight flex-align-center">
           <div class="mr20 flex-align-center">
-            <van-icon name="eye-o" />
+            <van-icon name="eye-o" size="15" />
             <p class="f16 ml5">预览</p>
           </div>
-          <van-icon name="delete" />
+          <van-icon name="delete" size="15" />
         </div>
       </div>
     </div>

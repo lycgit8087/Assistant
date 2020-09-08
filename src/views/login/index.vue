@@ -4,7 +4,7 @@
     <van-nav-bar title="注册登录" :fixed="true" />
     <div class="loginView">
       <p class="loginViewTitle">
-        <span>您是</span>
+        <span>登录</span>
       </p>
       <div class="identity" v-if='idshow' >
         <div
