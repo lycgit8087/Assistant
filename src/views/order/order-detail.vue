@@ -12,7 +12,7 @@
     </div>
 
     <!-- 留言 -->
-    <van-field v-model="message" border rows="1" autosize label="留言" placeholder="留言信息" type="textarea" />
+    <van-field readonly v-model="message" border rows="1" autosize label="留言" placeholder="留言信息" type="textarea" />
     <div class="people_des">
       <!-- 收件人信息 -->
       <van-field v-model="name"  label="收件人" readonly  />
@@ -27,21 +27,23 @@
         show-word-limit
       />
     </div>
-    <van-field  v-model="qrcode" clearable label="快递单号" placeholder="快递单号" right-icon="scan" />
+
+    <!-- 快递单号 -->
+    <van-field  v-model="exnumber" clearable label="快递单号" placeholder="快递单号" right-icon="scan" />
+
+    <!-- 快递公司 -->
+
+    <van-cell  title="顺风" icon="location-o" />
+
+
     <!-- 物流信息 -->
     <van-steps direction="vertical" :active="0">
-      <van-step>
-        <h3>【城市】物流状态1</h3>
-        <p>2016-07-12 12:40</p>
+      <van-step v-for="(item,index) in ex_info" :key="index" >
+        <p class="info-text" >{{item.time}}</p>
+
+        <p  class="info-title" >{{item.remark}}</p>
       </van-step>
-      <van-step>
-        <h3>【城市】物流状态2</h3>
-        <p>2016-07-11 10:00</p>
-      </van-step>
-      <van-step>
-        <h3>快件已发货</h3>
-        <p>2016-07-10 09:30</p>
-      </van-step>
+      
     </van-steps>
   </div>
 </template>
@@ -63,7 +65,8 @@ export default {
       place: "", //收件人地址
       name: "", //收件人名字
       phone: "",
-      qrcode: "",
+      exnumber: "",
+      ex_info:[],
       orderid: 0, //商品ID
       goods: "", //商品描述
       status_text: "", //订单状态
@@ -78,7 +81,11 @@ export default {
   //监听属性 类似于data概念
   computed: {},
   //监控data中的数据变化
-  watch: {},
+  watch: {
+    exnumber(val){
+        this.expressMatching()
+    }
+  },
   //方法集合
   methods: {
     getDetail() {
@@ -95,11 +102,24 @@ export default {
           this.phone = detail.mobile;
           this.message = detail.notes;
           this.goods = detail.goods;
+          this.ex_info=detail.ex_info
+          this.exnumber=detail.exnumber
           // let num =type_arr.findIndex(item=>item.)
           // this.color=type_arr
 
           console.log(detail);
         });
+    },
+
+    // 匹配快递公司
+    expressMatching(){
+      let {exnumber}=this
+      this.$api.order.expressMatching({
+        exnumber:exnumber
+      }).then(res=>{
+        console.log(exnumber)
+      })
+
     },
   },
   //生命周期 - 创建完成（可以访问当前this实例）
@@ -136,6 +156,21 @@ html {
   width: 100%;
   display: flex;
   box-sizing: border-box;
+}
+.info-title{
+font-size: 16px;
+font-family: PingFangSC-Medium, PingFang SC;
+font-weight: 500;
+color: #707070;
+
+}
+.info-text{
+font-size: 14px;
+font-family: PingFangSC-Regular, PingFang SC;
+font-weight: 400;
+color: #707070;
+margin-bottom: 10px;
+
 }
 .detail_top_des {
   display: flex;

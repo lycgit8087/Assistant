@@ -19,9 +19,9 @@
     return /^[\u4E00-\u9FA5]{2,4}$/.test(val);
   }
 
-  // 检测一位以上中文
+  // 检测字符不为空
  function textValidator(val) {
-  return /[A-Za-z0-9]|[\u4e00-\u9fa5]|[\u4e00-\u9fa5][\w\W]/.test(val);
+  return val.length>0;
 }
 
 //   检测手机号码

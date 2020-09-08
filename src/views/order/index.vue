@@ -5,7 +5,7 @@
       <van-tab v-for="(item,index) in tabList" :key="index" :title="item.title" :info="item.info">
         <div class="tabListChild">
           <div class="tabListChildEdit">
-            <van-search v-model="keyword" placeholder="请输入搜索关键词" />
+            <van-search v-model="keyword" class="listsearch" placeholder="请输入搜索关键词" />
             <p class="tabListChildFiler" @click="peopleToggle">
               <span>筛选</span>
               <van-icon name="filter-o" color="#FFA726" />
@@ -24,6 +24,7 @@
               finished-text="没有更多了"
               @load="onLoad"
               v-if="item.listData.length!=0"
+              class="vlist"
             >
               <div class="listParent">
                 <div
@@ -66,15 +67,20 @@
         <span class="popupView_title">批量操作订单</span>
 
         <div class="checkall">
-          <van-button round type="info" size="mini">全选</van-button>
+          <van-button round type="info" size="mini" @click="checkAll">{{isCheckAll?'反选':'全选'}}</van-button>
           <p>已选择{{checkOrder}}个订单</p>
         </div>
         <div class="popuplistView">
           <van-list>
-            <div class="popupView_child" v-for="(item,index) in decidedList" :key="index">
+            <div
+              class="popupView_child"
+              v-for="(item,index) in decidedList"
+              @click="checkSureOrder(index)"
+              :key="index"
+            >
               <div class="listChildTop">
                 <p>{{item.goods}}</p>
-                <span>待确认</span>
+                <span style="color:#E96960">待确认</span>
               </div>
               <div class="listChildTime">
                 <p>下单时间：{{item.time}}</p>
@@ -88,8 +94,8 @@
 
         <!-- 底部操作按钮 -->
         <div class="popupfooter">
-          <van-button type="info" class="sureclass">确定</van-button>
-          <van-button type="danger" class="deleclass">删除</van-button>
+          <van-button type="info" class="sureclass" @click="setSure">确定</van-button>
+          <van-button type="danger" class="deleclass" @click="delOrder">删除</van-button>
         </div>
       </div>
     </van-popup>
@@ -137,6 +143,8 @@
 </template>
 
 <script>
+import util from "../../utils/util";
+
 export default {
   name: "Order",
   data() {
@@ -147,7 +155,7 @@ export default {
       keyword: "",
       active: 0,
       peoplesearch: "",
-      isloading:false,
+      isloading: false,
       type_arr: [
         { text: "待确认", color: "#E96960", type: 0 },
         { text: "待发货", color: "#FFA726", type: 1 },
@@ -217,7 +225,21 @@ export default {
   },
   computed: {
     checkOrder() {
-      return this.decidedList.length;
+      let arr = this.decidedList.filter((item) => item.is_sure);
+      return arr.length;
+    },
+    // 是否全选
+    isCheckAll() {
+      let { decidedList } = this;
+      let arr = this.decidedList.filter((item) => item.is_sure);
+
+      return decidedList.length == arr.length;
+    },
+  },
+
+  watch: {
+    keyword(val) {
+      this.debounce(this);
     },
   },
   methods: {
@@ -225,15 +247,25 @@ export default {
       return `${date.getMonth() + 1}/${date.getDate()}`;
     },
 
+    // 防抖
+    debounce: util.debounce((vm) => {
+      // do something，这里this不指向Vue实例,用vm传入
+      vm.tabList[vm.active].pageNum = 1;
+      vm.getList();
+    }, 500),
+
     // 切换tab
     changeActive() {
-      this.getList();
+      let { tabList, active } = this;
+      if (tabList[active].listData.length == 0) {
+        this.getList();
+      }
     },
 
     // 订单列表
     getList() {
       let { keyword, tabList, active, type_arr } = this;
-      this.isloading=true
+      this.isloading = true;
       this.$api.order
         .list({
           keyword: keyword,
@@ -251,21 +283,26 @@ export default {
           if (list.length < 10) {
             this.tabList[active].finished = true;
           }
-          this.isloading=false
+          this.isloading = false;
         });
     },
 
     // 加载更多
     onLoad() {
-      let { keyword, tabList, active, type_arr } = this;
+      let { tabList, active, type_arr } = this;
       this.tabList[active].pageNum = tabList[active].pageNum + 1;
       this.getList();
     },
     // 下拉刷新
     onRefresh() {
-      let { keyword, tabList, active, type_arr } = this;
+      let { tabList, active, type_arr } = this;
       this.tabList[active].pageNum = 1;
       this.getList();
+    },
+
+    checkSureOrder(index) {
+      let { decidedList, decidedPageNum } = this;
+      this.decidedList[index].is_sure = !decidedList[index].is_sure;
     },
 
     // 获取确定订单
@@ -277,6 +314,7 @@ export default {
           page: decidedPageNum,
         })
         .then((res) => {
+          if (decidedPageNum == 1) decidedList = [];
           let list = res.data;
           list.forEach((item) => {
             item.is_sure = false;
@@ -285,16 +323,56 @@ export default {
           console.log(res);
         });
     },
+    //全选
+    checkAll() {
+      let { decidedList, decidedPageNum } = this;
+      let arr = decidedList.filter((item) => item.is_sure == false);
+
+      decidedList.forEach((item) => {
+        item.is_sure = arr.length == 0 ? false : true;
+      });
+    },
 
     //确认订单
     setSure() {
       let { decidedList } = this;
       let orderArr = decidedList.filter((item) => item.is_sure == true);
       let orderId = orderArr.map((item) => item.orderid);
-      this.$api.order.edit({
-        type: 1,
-        orderid: orderId.join(","),
-      });
+      this.$api.order
+        .edit({
+          type: 1,
+          orderid: orderId.join(","),
+        })
+        .then((res) => {
+          console.log(res);
+          this.$Toast.success("已确认");
+          this.decidedPageNum = 1;
+          this.getSureList();
+        });
+    },
+    //删除订单
+    delOrder() {
+      let { decidedList } = this;
+      let orderArr = decidedList.filter((item) => item.is_sure == true);
+      let orderId = orderArr.map((item) => item.orderid);
+
+      this.$Dialog
+        .confirm({
+          message: "确定删除吗？",
+        })
+        .then(() => {
+          this.$api.order
+            .del({
+              orderid: orderId.join(","),
+            })
+            .then((res) => {
+              console.log(res);
+              this.$Toast.success("删除成功");
+              this.decidedPageNum = 1;
+              this.getSureList();
+            });
+        })
+        .catch(() => {});
     },
     // 批量确定弹出框显示
     popupToggle() {
@@ -357,6 +435,10 @@ export default {
   display: flex;
   align-items: center;
   background: #fff;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 .popupView {
   min-width: 90vw;
@@ -422,7 +504,6 @@ export default {
   align-items: center;
 }
 .listChildDesLeft > p {
-  width: 89px;
   height: 24px;
   background: rgba(39, 60, 85, 0.2);
   border-radius: 3px;
@@ -432,6 +513,8 @@ export default {
   box-sizing: border-box;
   font-size: 12px;
   margin-right: 8px;
+  padding: 0 5px;
+  box-sizing: border-box;
 }
 .listChildDesLeft > span {
   font-size: 12px;
@@ -515,6 +598,11 @@ export default {
   padding: 0;
   margin-bottom: 20px;
 }
+.listsearch {
+  width: 200px;
+  padding-left: 0;
+  padding-right: 0;
+}
 .allpeople {
   width: 100%;
   display: flex;
@@ -535,6 +623,9 @@ export default {
   display: flex;
   flex-direction: column;
   flex-grow: 1;
+}
+.vlist {
+  padding-bottom: 80px;
 }
 .allpeoplechild_right_des {
   height: 44px;

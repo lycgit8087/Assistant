@@ -142,17 +142,6 @@ export default {
       let {placeShow}=this
       this.placeShow=!placeShow
     },
-
-    // 确定地址
-    confirmPlace(e){
-      console.log(e)
-    },
-
-    // 取消地址
-    cancelPlace(e){
-      console.log(e)
-    },
-
     // 添加下单链接
     addAgent() {
       let {ltag,placeDetail,shopname,placeText,username,phone,areaValue}=this
@@ -171,7 +160,6 @@ export default {
       this.$api.order.addrClean({
         text:placeText
       }).then(res=>{
-        console.log(res)
         if(res.data.length){
            let placeData=res.data[0]
             this.phone=placeData.mobile
@@ -179,7 +167,7 @@ export default {
             this.username=placeData.name
             this.message=placeData.notes
             this.defaultPlace=`${placeData.province_code},${placeData.city_code},${placeData.area_name}`
-            this.areaValue=`${placeData.province_name},${placeData.city_name},${placeData.area_name}`
+            this.areaValue=`${placeData.province_name}/${placeData.city_name}/${placeData.area_name}`
 
         }
       })

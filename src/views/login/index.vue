@@ -6,7 +6,7 @@
       <p class="loginViewTitle">
         <span>您是</span>
       </p>
-      <div class="identity">
+      <div class="identity" v-if='idshow' >
         <div
           :class="identityNum==index?'active_boder':''"
           @click="chnageIdentity(index)"
@@ -73,6 +73,7 @@ export default {
     return {
       value: "",
       phone: "",
+      idshow:false,
       sms: "",
       identity: [
         {
@@ -138,20 +139,20 @@ export default {
     // 登录注册
     onsubmit() {
       let { phone, sms, identityNum, identity } = this;
-      if (identityNum == -1) {
-        Notify({
-          message: "请选择您的身份",
-          type: "warning",
-          duration: 3 * 1000,
-        });
-        return;
-      }
+      // if (identityNum == -1) {
+      //   Notify({
+      //     message: "请选择您的身份",
+      //     type: "warning",
+      //     duration: 3 * 1000,
+      //   });
+      //   return;
+      // }
+      // utype: identity[identityNum].type,
+
       this.$api.user.userBind("user_bind", "/?c=api", {
-        utype: identity[identityNum].type,
         mobile: phone,
         vcode: sms,
       }).then((res) => {
-        console.log(res);
         localStorage.setItem("token",res.token)
         let token_time= Date.parse(res.token_expires)
         localStorage.setItem("token_time",token_time)

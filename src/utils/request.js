@@ -10,6 +10,41 @@ const root = process.env.API_ROOT;
 axios.defaults.retry = 4;
 axios.defaults.retryDelay = 1000;
 
+const codeMessage = {
+  400: '发出的请求有错误，服务器没有进行新建或修改数据的操作。',
+  401: '用户没有权限（令牌、用户名、密码错误）。',
+  403: '用户得到授权，但是访问是被禁止的。',
+  404: '发出的请求针对的是不存在的记录，服务器没有进行操作。',
+  406: '请求的格式不可得。',
+  410: '请求的资源被永久删除，且不会再得到的。',
+  422: '当创建一个对象时，发生一个验证错误。',
+  500: '服务器发生错误，请检查服务器。',
+  502: '网关错误。',
+  503: '服务不可用，服务器暂时过载或维护。',
+  504: '网关超时。'
+}
+
+// 处理接口（系统）和网络异常
+const errorHandler = error => {
+  if (error && error.response) {
+    const { response } = error
+    const errorText = codeMessage[response.status] || response.statusText
+    const { status, url } = response
+
+    Notify({
+      message: `请求错误${errorText} ${status}: ${url}`,
+      type: 'danger',
+      duration: 3 * 1000
+    })
+  } else {
+    Notify({
+      message: `网络异常`,
+      type: 'danger',
+      duration: 3 * 1000
+    })
+  }
+}
+
 //http request 拦截器
 axios.interceptors.request.use(
   config => {
@@ -80,6 +115,7 @@ axios.interceptors.response.use(
       const token_time = parseInt(localStorage.getItem("token_time")) ;
       let now_time=Date.parse(new Date())
       let is_get_token=((token_time-now_time)/60000)>10
+      console.log(now_time,token_time)
       if(!is_get_token&&token_time){
           api.user.tokenUpdate().then(res=>{
             localStorage.setItem("token",res.token)
@@ -105,12 +141,11 @@ axios.interceptors.response.use(
         }      
       }
       tryHideLoading()
-
     return response.data;
   },
   error => {
     tryHideLoading()
-    console.log(error)
+    errorHandler(error)
     return Promise.reject(error)
   }
 )
