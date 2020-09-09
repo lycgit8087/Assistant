@@ -108,7 +108,7 @@
         <!-- 搜索按钮 -->
         <van-search class="poeple_search" v-model="peoplesearch" placeholder="请输入搜索关键词" />
         <div class="allpeople">
-          <div class="allpeoplechild" v-for="item in peopleList" :key="item">
+          <div class="allpeoplechild" v-for="(item,index) in peopleList" :key="index">
             <van-image fit="cover" :src="item.avatar" />
             <div class="allpeoplechild_right">
               <p class="allpeoplechild_right_des">
@@ -132,6 +132,18 @@
         </div>
       </div>
     </van-popup>
+
+
+    <!-- 右侧固定按钮 -->
+
+    <div class="fix-right" >
+      <div class="fix-right-child" >
+
+         <div :class="[item.cls,index==btnNum?'active-bth':'']" v-for="(item,index) in bthArr" @click="checkBtn(index)"  >{{item.text}}</div>
+
+      </div>
+     
+    </div>
   </div>
 </template>
 
@@ -149,6 +161,13 @@ export default {
       active: 0,
       peoplesearch: "",
       isloading: false,
+      btnNum:0,
+      bthArr:[
+        {text:"购买的订单",cls:"onebth"},
+        {text:"代理的订单",cls:"twobth"},
+        {text:"供货的订单",cls:"therebth"},
+
+      ],
       type_arr: [
         { text: "待确认", color: "#E96960", type: 0 },
         { text: "待发货", color: "#FFA726", type: 1 },
@@ -255,6 +274,10 @@ export default {
       if (tabList[active].listData.length == 0) {
         this.getList();
       }
+    },
+    // 选择身份
+    checkBtn(index){
+      this.btnNum=index
     },
 
     // 获取代理商列表
@@ -558,6 +581,51 @@ export default {
   font-family: PingFangSC-Medium, PingFang SC;
   font-weight: 500;
   color: #202020;
+}
+
+.fix-right{
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  bottom: 40vh;
+  right: 0;
+  z-index: 55;
+  width: 90px;
+}
+.fix-right-child{
+  position: relative;
+}
+.fix-right-child>div{
+  width: 90px;
+  height: 30px;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  color: #fff;
+  background: cornflowerblue;
+  margin-bottom: 10px;
+  border-top-left-radius: 15px;
+  border-bottom-left-radius: 15px;
+  animation: all 500ms ease;
+  right: -55%;
+  position: absolute;
+  opacity: 0.4;
+
+}
+.active-bth{
+  right: -10% !important;
+  opacity: 1 !important;
+}
+.onebth{
+  top: 0;
+}
+.twobth{
+  top: 40px;
+}
+.therebth{
+  top: 80px;
 }
 
 .popupView_child {

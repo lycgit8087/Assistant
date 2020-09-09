@@ -163,6 +163,7 @@ font-size: 16px;
 font-family: PingFangSC-Medium, PingFang SC;
 font-weight: 500;
 color: #707070;
+line-height: 1.5;
 
 }
 .info-text{

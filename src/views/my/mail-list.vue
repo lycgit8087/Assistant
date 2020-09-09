@@ -14,7 +14,7 @@
           :name="ditem.lid"
           
         >
-          <div class="mial_people" @click="toAgent(ditem.name)" >
+          <div class="mial_people" @click="toAgent(ditem.aid)" >
             <div class="mial_people_left">
               <van-image fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
               <div class="mial_people_left_des">
@@ -133,12 +133,11 @@ export default {
       return listData;
     },
 
-    toAgent(position){
-      console.log(position)
-      if(position=="cell"){
-      this.$router.push({ name: "agent" });
+    toAgent(aid){
+      console.log(aid)
+      this.$router.push({ name: "agent", query: { aid: aid } });
 
-      }
+      
     },
 
     // 防抖
