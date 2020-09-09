@@ -132,7 +132,6 @@ axios.interceptors.response.use(
               })
           localStorage.setItem("token", "");
           let indexUrl=localStorage.getItem("indexUrl")
-          console.log(indexUrl)
           window.location.href=indexUrl
         }else{
           Notify({

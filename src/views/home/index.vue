@@ -34,6 +34,7 @@ export default {
   },
   created() {
     let userInfo=this.$store.state.userInfo
+    console.log(localStorage.getItem("token"))
     if(JSON.stringify(userInfo)=="{}"){
       this.$api.user.userInfo().then(res=>{
       if(res.data.mobile_bind==0){
