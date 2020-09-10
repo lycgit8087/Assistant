@@ -12,11 +12,10 @@
           :key="dindex"
           :before-close="beforeClose"
           :name="ditem.lid"
-          
         >
-          <div class="mial_people" @click="toAgent(ditem.aid)" >
+          <div class="mial_people" @click="toAgent(ditem.aid)">
             <div class="mial_people_left">
-              <van-image fit="cover" src="https://img.yzcdn.cn/vant/cat.jpeg" />
+              <van-image fit="cover" :src="ditem.avatar" />
               <div class="mial_people_left_des">
                 <p>
                   <span>{{ditem.name}}</span>
@@ -25,10 +24,17 @@
                 <span>{{ditem.mobile}}</span>
               </div>
             </div>
-            <p :class="ditem.rstatus==0?'rclass':'gclass'" >{{ditem.rstatus==0?"未注册":"已注册"}}</p>
+            <p :class="ditem.rstatus==0?'rclass':'gclass'">{{ditem.rstatus==0?"未注册":"已注册"}}</p>
           </div>
           <template #right>
-            <van-button @click="setBtnType(0)" square text="删除" type="danger" class="delete-button" /><van-button @click="setBtnType(1)" square type="primary" text="编辑" />
+            <van-button
+              @click="setBtnType(0)"
+              square
+              text="删除"
+              type="danger"
+              class="delete-button"
+            />
+            <van-button @click="setBtnType(1)" square type="primary" text="编辑" />
           </template>
         </van-swipe-cell>
       </div>
@@ -89,8 +95,8 @@ export default {
       list: [],
       oldList: [],
       indexList: [],
-      btnType:0,
-      editLid:0
+      btnType: 0,
+      editLid: 0,
     };
   },
   //监听属性 类似于data概念
@@ -133,11 +139,8 @@ export default {
       return listData;
     },
 
-    toAgent(aid){
-      console.log(aid)
+    toAgent(aid) {
       this.$router.push({ name: "agent", query: { aid: aid } });
-
-      
     },
 
     // 防抖
@@ -164,24 +167,22 @@ export default {
 
     // 代理商添加
     onsubmit() {
-      let {editLid}=this
-      if(editLid==0){
-          this.addAgent()
-      }else{
-          this.editAgent()
+      let { editLid } = this;
+      if (editLid == 0) {
+        this.addAgent();
+      } else {
+        this.editAgent();
       }
-      
     },
     // 关闭弹出框
 
-    closePopup(){
-        this.username=""
-        this.phone=""
-        this.editLid=0
-
+    closePopup() {
+      this.username = "";
+      this.phone = "";
+      this.editLid = 0;
     },
     // 添加代理商
-    addAgent(){
+    addAgent() {
       let { username, phone } = this;
       this.$api.agent
         .add({
@@ -198,18 +199,18 @@ export default {
     },
 
     // 编辑代理商
-    editAgent(){
-      let { username, phone,editLid } = this;
+    editAgent() {
+      let { username, phone, editLid } = this;
       this.$api.agent
         .edit({
-          lid:editLid,
+          lid: editLid,
           name: username,
           mobile: phone,
         })
         .then((res) => {
           this.$Toast.success("编辑成功");
           this.show = false;
-          this.editLid=0
+          this.editLid = 0;
           setTimeout(() => {
             this.getList();
           }, 500);
@@ -218,46 +219,43 @@ export default {
 
     // 删除确认框
     beforeClose({ name, position, instance }) {
-      let {btnType}=this
+      let { btnType } = this;
       if (position == "right") {
-        console.log(btnType)
-        if(btnType==0){
-           this.$Dialog
-          .confirm({
-            message: "确定删除吗？",
-          })
-          .then(() => {
-            instance.close();
-          }).catch(()=>{
-            instance.close();
-            
-          });
-        }else{
-          this.editPeople(name)
+        console.log(btnType);
+        if (btnType == 0) {
+          this.$Dialog
+            .confirm({
+              message: "确定删除吗？",
+            })
+            .then(() => {
+              instance.close();
+            })
+            .catch(() => {
+              instance.close();
+            });
+        } else {
+          this.editPeople(name);
           instance.close();
         }
-       
       }
     },
     // 编辑代理商
-    editPeople(editLid){
-      let {list}=this
-      this.editLid=editLid
+    editPeople(editLid) {
+      let { list } = this;
+      this.editLid = editLid;
 
-      this.show=true
-      let people={}
+      this.show = true;
+      let people = {};
       list.forEach((item, index) => {
-            people= item.data.filter((ditem) => ditem.lid == editLid);
-          });
-      people=people[0]
-          console.log(people)
-          this.username=people.name
-          this.phone=people.mobile
-
+        people = item.data.filter((ditem) => ditem.lid == editLid);
+      });
+      people = people[0];
+      this.username = people.name;
+      this.phone = people.mobile;
     },
 
-    setBtnType(type){
-      this.btnType=type
+    setBtnType(type) {
+      this.btnType = type;
     },
 
     // 删除代理商
@@ -326,12 +324,11 @@ export default {
   padding: 5px 5px;
   box-sizing: border-box;
 }
-.gclass{
+.gclass {
   background: #75c16d;
 }
-.rclass{
-  background: #E96960;
-
+.rclass {
+  background: #e96960;
 }
 .mial_people_left {
   height: 100%;

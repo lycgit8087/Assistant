@@ -120,10 +120,13 @@
                   :title="litem.name"
                   v-for="(litem,lindex) in item.link_data"
                   :key="lindex"
+                  @click="agentCheck(index,lindex)"
                 >
                   <template #right-icon>
-                    <div class="iconview">
-                      <van-icon name="search" class="search=icon" />
+                    <div class="iconview" >
+                      <van-icon v-if="litem.isCheck" name="checked" color="#E96960" size="20" />
+
+                <van-icon v-else name="passed" size="20" />
                     </div>
                   </template>
                 </van-cell>
@@ -131,7 +134,7 @@
             </div>
           </div>
 
-          <van-button type="info">确定</van-button>
+          <van-button type="info" @click="sureAgentCheck" >确定</van-button>
         </div>
       </div>
     </van-popup>
@@ -234,6 +237,7 @@ export default {
       decidedPageNum: 1,
       agetnName: "", //代理商名称
       peopleList: [], //筛选列表
+      ltagArr:[]
     };
   },
   created() {
@@ -311,9 +315,39 @@ export default {
       this.getList();
     },
 
+     //筛选
+    peopleToggle() {
+      let {btnNum}=this
+      if(btnNum==1){
+        this.getSupplierList()
+      }else{
+      this.getAgentDetail();
+
+      }
+      this.peopleShow = !this.peopleShow;
+    },
+    // 获取供应商列表
+
+    getSupplierList(){
+      let {peopleList,peoplesearch}=this
+      this.$api.supplier.list({
+        name:peoplesearch
+      }).then(res=>{
+        let list=res.data
+        list.forEach(item=>{
+            item.link_data.forEach(litem=>{
+              litem.isCheck=false
+            })
+          })
+        this.peopleList=list
+        console.log(list)
+      })
+    },
+
     // 获取代理商列表
     getAgentDetail() {
       let { agetnName, peopleList } = this;
+      if(peopleList.length!=0)return
       this.$api.agent
         .list({
           is_link: 1,
@@ -322,14 +356,42 @@ export default {
         .then((res) => {
           let list = res.data;
           peopleList = [];
+          list.forEach(item=>{
+            item.link_data.forEach(litem=>{
+              litem.isCheck=false
+            })
+          })
           this.peopleList = list;
-          console.log(res);
         });
+    },
+    // 选择代理商或供应商
+    agentCheck(index,lindex){
+      let {peopleList}=this
+      this.peopleList[index].link_data[lindex].isCheck=!peopleList[index].link_data[lindex].isCheck
+    },
+
+    // 确定选择代理商或供应商
+    sureAgentCheck(){
+      let {peopleList}=this
+      let {ltagArr}=this
+      ltagArr=[]
+      peopleList.forEach(item=>{
+        item.link_data.forEach(litem=>{
+          if(litem.isCheck){
+            ltagArr.push(litem.ltag)
+
+          }
+        })
+      })
+      this.ltagArr=ltagArr
+      this.peopleShow=false
+      this.getList()
+
     },
 
     // 订单列表
     getList() {
-      let { keyword, tabList, active, type_arr,btnNum } = this;
+      let { keyword, tabList, active, type_arr,btnNum,ltagArr } = this;
       this.isloading = true;
       this.$api.order
         .list({
@@ -337,6 +399,7 @@ export default {
           keyword: keyword,
           status: tabList[active].type,
           page: tabList[active].pageNum,
+          ltag:ltagArr.join(",")
         })
         .then((res) => {
           let list = res.data;
@@ -475,11 +538,7 @@ export default {
       });
     },
 
-    //筛选
-    peopleToggle() {
-      this.peopleShow = !this.peopleShow;
-      this.getAgentDetail();
-    },
+   
   },
 };
 </script>

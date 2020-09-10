@@ -136,6 +136,7 @@ html{
   height: 44px;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   width: 100%;
 }
 .allpeoplechild_right_des span:nth-child(1) {
