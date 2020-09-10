@@ -11,17 +11,36 @@
         </div>
         <div class="agentListChildRight flex-align-center">
           <div class="mr20 flex-align-center">
-            <van-icon name="eye-o" size="15" />
-            <p class="f16 ml5">预览</p>
+            <van-image class="shareCls" fit="cover" :src="shareIcon" />
+            <p class="f16 ml5">分享</p>
           </div>
-          <van-icon name="delete" size="15" />
+          <van-icon name="delete" size="15" color="#E96960" />
         </div>
       </div>
     </div>
 
     <div class="fix-btn">
-      <van-button type="info" class="addbtn" @click="toAddAgent">新增渠道</van-button>
+      <van-button type="info" class="addbtn" @click="show=true">新增渠道</van-button>
     </div>
+
+
+     <van-popup v-model="show" closeable @close="closePopup">
+      <div class="addpeople flex-align-center">
+        <van-form validate-first @submit="onsubmit">
+          <p class="add-people-title">添加渠道</p>
+          <p class="add-people-text">渠道名称</p>
+          <van-field
+            v-model="name"
+            :rules="[{ validator:regUserName, message: '请输入渠道名称' }]"
+            class="field-no-padding"
+            :border="false"
+            placeholder="渠道名称"
+          />
+
+          <van-button native-type="submit" class="keepbtn" type="info">保存</van-button>
+        </van-form>
+      </div>
+    </van-popup>
   </div>
 </template>
 
@@ -37,6 +56,10 @@ export default {
   data() {
     //这里存放数据
     return {
+      aid:0,
+      show:false,
+      name:"",
+      shareIcon: require("../../assets/images/shareIcon.png") 
     };
   },
   //监听属性 类似于data概念
@@ -45,23 +68,36 @@ export default {
   watch: {},
   //方法集合
   methods: {
-    goto(name) {
-      this.$router.push({ name: name });
+    getDetail(){//获取详情
+      let {aid}=this
+      this.$api.agent.detail({
+        id:aid
+      }).then(res=>{
+        console.log(res)
+      })
     },
-    openIt() {
-      this.$api.user.tokenUpdate((res) => {
-        console.log(res);
-      });
+
+    closePopup(){
+
     },
-    toAddAgent() {
-      this.$router.push({ name: "order-edit" });
+
+    onsubmit(){
+
+    },
+
+    // 检测用户名
+    regUserName(val) {
+      return /^[\u4E00-\u9FA5]{2,4}$/.test(val);
     },
   },
   //生命周期 - 创建完成（可以访问当前this实例）
-  created() {},
+  created() {
+    console.log(this.$route.query)
+    this.aid = this.$route.query.aid;
+    this.getDetail()
+  },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {
-    console.log(this.$store.state.userInfo);
   },
   beforeCreate() {}, //生命周期 - 创建之前
   beforeMount() {}, //生命周期 - 挂载之前
@@ -77,6 +113,10 @@ export default {
 html {
   background: #fbfcfe;
   height: 100%;
+}
+.shareCls{
+  width: 15px;
+  height: 15px;
 }
 
 .agentList {
@@ -115,5 +155,34 @@ html {
   font-size: 16px;
   font-weight: 400;
   color: #202020;
+}
+.addpeople {
+  width: 297px;
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 15px 21px;
+  box-sizing: border-box;
+  flex-direction: column;
+}
+.add-people-title {
+  display: flex;
+  font-size: 18px;
+  font-weight: 500;
+  color: #28292e;
+  margin-bottom: 10px;
+}
+.add-people-text {
+  font-size: 14px;
+  font-weight: 400;
+  color: #28292e;
+  margin-bottom: 9px;
+  width: 100%;
+  margin-top: 20px;
+}
+.keepbtn {
+  width: 255px !important;
+  box-shadow: 0px 9px 15px 1px rgba(0, 120, 255, 0.15);
+  border-radius: 5px;
+  margin-top: 57px;
 }
 </style>

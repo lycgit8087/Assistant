@@ -12,38 +12,50 @@
     </div>
 
     <!-- 留言 -->
-    <van-field readonly v-model="message" border rows="1" autosize label="留言" placeholder="留言信息" type="textarea" />
+    <van-field
+      readonly
+      v-model="message"
+      border
+      rows="1"
+      autosize
+      label="留言"
+      placeholder="留言信息"
+      type="textarea"
+    />
     <div class="people_des">
       <!-- 收件人信息 -->
-      <van-field v-model="name"  label="收件人" readonly  />
-      <van-field v-model="phone"  label="联系方式" readonly  />
+      <van-field v-model="name" label="收件人" readonly />
+      <van-field v-model="phone" label="联系方式" readonly />
       <van-field
         v-model="place"
         rows="2"
         autosize
         label="收货地址"
         type="textarea"
-        readonly 
+        readonly
         show-word-limit
       />
     </div>
 
     <!-- 快递单号 -->
-    <van-field  v-model="exnumber" clearable label="快递单号" placeholder="快递单号" right-icon="scan" />
+    <van-field v-model="exnumber" clearable label="快递单号" placeholder="快递单号" right-icon="scan" />
 
     <!-- 快递公司 -->
 
-    <van-cell v-if="exnumber"  title="顺风" icon="location-o" />
-
+    <van-cell v-if="exnumber"  >
+      <template #title>
+        <van-tag plain type="primary">{{exTag}}</van-tag>
+        <span >{{exName}}</span>
+      </template>
+    </van-cell>
 
     <!-- 物流信息 -->
     <van-steps direction="vertical" :active="0">
-      <van-step v-for="(item,index) in ex_info" :key="index" >
-        <p class="info-text" >{{item.time}}</p>
+      <van-step v-for="(item,index) in ex_info" :key="index">
+        <p class="info-text">{{item.time}}</p>
 
-        <p  class="info-title" >{{item.remark}}</p>
+        <p class="info-title" v-html="item.remark" ></p>
       </van-step>
-      
     </van-steps>
   </div>
 </template>
@@ -66,7 +78,7 @@ export default {
       name: "", //收件人名字
       phone: "",
       exnumber: "",
-      ex_info:[],
+      ex_info: [],
       orderid: 0, //商品ID
       goods: "", //商品描述
       status_text: "", //订单状态
@@ -76,16 +88,17 @@ export default {
         { text: "已发货", color: "#E96960", type: 2 },
         { text: "已签收", color: "#75C16D", type: 3 },
       ],
+      exName: "",
+      exTag: "",
     };
   },
   //监听属性 类似于data概念
   computed: {},
   //监控data中的数据变化
   watch: {
-    exnumber(val){
-      
-        this.expressMatching()
-    }
+    exnumber(val) {
+      this.expressMatching();
+    },
   },
   //方法集合
   methods: {
@@ -103,24 +116,52 @@ export default {
           this.phone = detail.mobile;
           this.message = detail.notes;
           this.goods = detail.goods;
-          this.ex_info=detail.ex_info
-          this.exnumber=detail.exnumber
+          this.ex_info = detail.ex_info;
+          this.exnumber = detail.exnumber;
           // let num =type_arr.findIndex(item=>item.)
           // this.color=type_arr
-
+          detail.ex_info.forEach(item=>{
+          console.log(this.selectPhoneNumber(item.remark))
+            item.remark=this.selectPhoneNumber(item.remark)
+          })
           console.log(detail);
         });
     },
 
     // 匹配快递公司
-    expressMatching(){
-      let {exnumber}=this
-      this.$api.order.expressMatching({
-        exnumber:exnumber
-      }).then(res=>{
-        console.log(exnumber)
-      })
-
+    expressMatching() {
+      let { exnumber } = this;
+      this.$api.order
+        .expressMatching({
+          exnumber: exnumber,
+        })
+        .then((res) => {
+          console.log(res);
+          let listData = res.data;
+          if(listData.length){
+            listData=listData[0]
+            this.exName = listData.name;
+            this.exTag = listData.tag;
+          }
+          
+        });
+    },
+    //替换字符串中的手机号码
+    selectPhoneNumber(str) {
+      var regx = /(1[3|4|5|7|8][\d]{9}|0[\d]{2,3}-[\d]{7,8}|400[-]?[\d]{3}[-]?[\d]{4})/g;
+      var phoneNums = str.match(regx);
+      console.log(phoneNums)
+      if (phoneNums) {
+        for (var i = 0; i < phoneNums.length; i++) {
+          var temp = phoneNums[i];
+          console.log(phoneNums[i])
+          str = str.replace(
+            phoneNums[i],
+            `<a href="${temp}">${temp}</a>`
+          );
+        }
+      }
+      return str;
     },
   },
   //生命周期 - 创建完成（可以访问当前this实例）

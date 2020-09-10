@@ -1,8 +1,7 @@
 <template>
   <div class="Order">
     <!-- :sticky="true" :offset-top="45" -->
-    <van-tabs v-model="active" @change="changeActive" >
-      
+    <van-tabs v-model="active" @change="changeActive">
       <van-tab v-for="(item,index) in tabList" :key="index" :title="item.title" :info="item.info">
         <div class="tabListChild">
           <div class="tabListChildEdit">
@@ -117,7 +116,11 @@
               </p>
               <!-- 下单链接 -->
               <van-cell-group>
-                <van-cell :title="litem.name" v-for="(litem,lindex) in item.link_data" :key="lindex" >
+                <van-cell
+                  :title="litem.name"
+                  v-for="(litem,lindex) in item.link_data"
+                  :key="lindex"
+                >
                   <template #right-icon>
                     <div class="iconview">
                       <van-icon name="search" class="search=icon" />
@@ -133,16 +136,16 @@
       </div>
     </van-popup>
 
-
     <!-- 右侧固定按钮 -->
 
-    <div class="fix-right" >
-      <div class="fix-right-child" >
-
-         <div :class="[item.cls,index==btnNum?'active-bth':'']" v-for="(item,index) in bthArr" @click="checkBtn(index)"  >{{item.text}}</div>
-
+    <div class="fix-right">
+      <div class="fix-right-child">
+        <div
+          :class="[item.cls,index==btnNum?'active-bth':'']"
+          v-for="(item,index) in bthArr"
+          @click="checkBtn(index)"
+        >{{item.text}}</div>
       </div>
-     
     </div>
   </div>
 </template>
@@ -161,18 +164,17 @@ export default {
       active: 0,
       peoplesearch: "",
       isloading: false,
-      btnNum:0,
-      bthArr:[
-        {text:"购买的订单",cls:"onebth"},
-        {text:"代理的订单",cls:"twobth"},
-        {text:"供货的订单",cls:"therebth"},
-
+      btnNum: 0,
+      bthArr: [
+        { text: "购买的订单", cls: "onebth", type: 0 },
+        { text: "代理的订单", cls: "twobth", type: 1 },
+        { text: "供货的订单", cls: "therebth", type: 2 },
       ],
       type_arr: [
         { text: "待确认", color: "#E96960", type: 0 },
         { text: "待发货", color: "#FFA726", type: 1 },
         { text: "已发货", color: "#E96960", type: 2 },
-        { text: "已签收", color: "#75C16D", type: 3 },
+        { text: "已签收", color: "#75C16D", type: 6 },
       ],
       tabList: [
         {
@@ -217,7 +219,7 @@ export default {
         },
         {
           title: "已签收",
-          type: "3",
+          type: "6",
           listData: [],
           pageNum: 1,
           finished: false,
@@ -230,12 +232,22 @@ export default {
       peopleShow: false,
       decidedList: [], //待确定列表
       decidedPageNum: 1,
-      agetnName:"",//代理商名称
-      peopleList:[]//筛选列表
+      agetnName: "", //代理商名称
+      peopleList: [], //筛选列表
     };
   },
   created() {
-    this.getList();
+    
+    if ( JSON.stringify(this.$store.state.userInfo)!="{}" ) {
+      console.log(this.$store.state.userInfo)
+      let { identity } = this.$store.state.userInfo;
+      let { btnNum, bthArr } = this;
+      btnNum =identity == 3 ? 2 : bthArr.findIndex(item => item.type == identity);
+      this.btnNum = btnNum;
+      this.getList();
+    } else {
+      this.getInfo();
+    }
   },
   computed: {
     checkOrder() {
@@ -246,7 +258,6 @@ export default {
     isCheckAll() {
       let { decidedList } = this;
       let arr = this.decidedList.filter((item) => item.is_sure);
-
       return decidedList.length == arr.length;
     },
   },
@@ -257,6 +268,18 @@ export default {
     },
   },
   methods: {
+    getInfo() {
+      this.$api.user.userInfo().then((res) => {
+        this.$store.dispatch("USER_INFO", res.data);
+        let identity = res.data.identity;
+        let { btnNum, bthArr } = this;
+        btnNum =
+          identity == 3 ? 2 : bthArr.findIndex((item) => item.type == identity);
+        
+        this.btnNum = btnNum;
+        this.getList();
+      });
+    },
     formatDate(date) {
       return `${date.getMonth() + 1}/${date.getDate()}`;
     },
@@ -276,30 +299,41 @@ export default {
       }
     },
     // 选择身份
-    checkBtn(index){
-      this.btnNum=index
+    checkBtn(index) {
+      let {bthArr,tabList}=this
+      this.btnNum = index;
+      tabList.forEach(item=>{
+        item.pageNum=1
+        item.info=""
+        item.listData=[]
+        item.finished=false
+      })
+      this.getList();
     },
 
     // 获取代理商列表
-    getAgentDetail(){
-      let {agetnName,peopleList}=this
-      this.$api.agent.list({
-        is_link:1,
-        name:agetnName
-      }).then(res=>{
-        let list=res.data
-        peopleList=[]
-        this.peopleList=list
-        console.log(res)
-      })
+    getAgentDetail() {
+      let { agetnName, peopleList } = this;
+      this.$api.agent
+        .list({
+          is_link: 1,
+          name: agetnName,
+        })
+        .then((res) => {
+          let list = res.data;
+          peopleList = [];
+          this.peopleList = list;
+          console.log(res);
+        });
     },
 
     // 订单列表
     getList() {
-      let { keyword, tabList, active, type_arr } = this;
+      let { keyword, tabList, active, type_arr,btnNum } = this;
       this.isloading = true;
       this.$api.order
         .list({
+          type:btnNum,
           keyword: keyword,
           status: tabList[active].type,
           page: tabList[active].pageNum,
@@ -307,13 +341,19 @@ export default {
         .then((res) => {
           let list = res.data;
           list.forEach((item) => {
-            let num = type_arr.findIndex((titem) => titem.type == status);
+            let num = type_arr.findIndex((titem) => titem.type == item.status);
             item.colorText = type_arr[num].color;
           });
-          if(tabList[active].pageNum==1)tabList[active].listData=[]
-          this.tabList[active].listData =[...tabList[active].listData,...list];
+          if (tabList[active].pageNum == 1) tabList[active].listData = [];
+          this.tabList[active].listData = [
+            ...tabList[active].listData,
+            ...list,
+          ];
           this.tabList[active].refreshing = false;
-          this.tabList[active].info=this.tabList[active].listData.length==0?'':this.tabList[active].listData.length
+          this.tabList[active].info =
+            this.tabList[active].listData.length == 0
+              ? ""
+              : this.tabList[active].listData.length;
 
           if (list.length < 10) {
             this.tabList[active].finished = true;
@@ -372,9 +412,9 @@ export default {
     setSure() {
       let { decidedList } = this;
       let orderArr = decidedList.filter((item) => item.is_sure == true);
-      if(orderArr.length==0){
-        this.$Toast('请选择待确定订单');
-        return
+      if (orderArr.length == 0) {
+        this.$Toast("请选择待确定订单");
+        return;
       }
       let orderId = orderArr.map((item) => item.orderid);
       this.$api.order
@@ -392,9 +432,9 @@ export default {
     delOrder() {
       let { decidedList } = this;
       let orderArr = decidedList.filter((item) => item.is_sure == true);
-      if(orderArr.length==0){
-        this.$Toast('请选择待确定订单');
-        return
+      if (orderArr.length == 0) {
+        this.$Toast("请选择待确定订单");
+        return;
       }
       let orderId = orderArr.map((item) => item.orderid);
 
@@ -437,7 +477,7 @@ export default {
     //筛选
     peopleToggle() {
       this.peopleShow = !this.peopleShow;
-      this.getAgentDetail()
+      this.getAgentDetail();
     },
   },
 };

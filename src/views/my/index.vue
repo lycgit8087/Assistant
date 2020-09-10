@@ -76,13 +76,8 @@ export default {
     goto(name) {
       this.$router.push({ name: name });
     },
-    openIt(name) {
-      this.$router.push({ name: name });
-    },
     toPlace(){
       this.$router.push({ name: "order-edit" });
-
-      
     },
   },
   //生命周期 - 创建完成（可以访问当前this实例）
@@ -93,9 +88,6 @@ export default {
     myList=identity==2?myList.filter(item=>item.type==2):myList.filter(item=>item.type<=identity)
     this.myList=myList
     this.orderList=orderList
-
-
-
   },
   //生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {

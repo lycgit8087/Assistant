@@ -115,7 +115,7 @@ axios.interceptors.response.use(
       const token_time = parseInt(localStorage.getItem("token_time")) ;
       let now_time=Date.parse(new Date())
       let is_get_token=((token_time-now_time)/60000)>10
-      console.log(now_time,token_time)
+      
       if(!is_get_token&&token_time){
           api.user.tokenUpdate().then(res=>{
             localStorage.setItem("token",res.token)
