@@ -382,9 +382,10 @@ export default {
 
     // 获取确定订单
     getSureList() {
-      let { decidedList, decidedPageNum } = this;
+      let { decidedList, decidedPageNum,btnNum } = this;
       this.$api.order
         .list({
+          type:btnNum,
           status: 0,
           page: decidedPageNum,
         })

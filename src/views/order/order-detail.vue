@@ -6,9 +6,9 @@
     <div class="detail_top">
       <div class="detail_top_des">
         <p>{{goods}}</p>
-        <span>{{status_text}}</span>
+        <span :style="'background:'+color" >{{status_text}}</span>
       </div>
-      <p class="detail_top_time">下单时间：2020/08/16 09:35</p>
+      <p v-if="orderTime" class="detail_top_time">下单时间：{{orderTime}}</p>
     </div>
 
     <!-- 留言 -->
@@ -82,11 +82,13 @@ export default {
       orderid: 0, //商品ID
       goods: "", //商品描述
       status_text: "", //订单状态
+      orderTime: "", //订单时间
+      color:"",
       type_arr: [
         { text: "待确认", color: "#E96960", type: 0 },
         { text: "待发货", color: "#FFA726", type: 1 },
         { text: "已发货", color: "#E96960", type: 2 },
-        { text: "已签收", color: "#75C16D", type: 3 },
+        { text: "已签收", color: "#75C16D", type: 6 },
       ],
       exName: "",
       exTag: "",
@@ -118,13 +120,14 @@ export default {
           this.goods = detail.goods;
           this.ex_info = detail.ex_info;
           this.exnumber = detail.exnumber;
-          // let num =type_arr.findIndex(item=>item.)
-          // this.color=type_arr
+          this.c=detail.time
+          let colorNum=type_arr.findIndex(itme=>itme.type==detail.status)
+          let color=colorNum==-1?"#E96960":type_arr[colorNum].color
+          console.log(colorNum,color)
+          this.color=color
           detail.ex_info.forEach(item=>{
-          console.log(this.selectPhoneNumber(item.remark))
             item.remark=this.selectPhoneNumber(item.remark)
           })
-          console.log(detail);
         });
     },
 
@@ -148,20 +151,7 @@ export default {
     },
     //替换字符串中的手机号码
     selectPhoneNumber(str) {
-      var regx = /(1[3|4|5|7|8][\d]{9}|0[\d]{2,3}-[\d]{7,8}|400[-]?[\d]{3}[-]?[\d]{4})/g;
-      var phoneNums = str.match(regx);
-      console.log(phoneNums)
-      if (phoneNums) {
-        for (var i = 0; i < phoneNums.length; i++) {
-          var temp = phoneNums[i];
-          console.log(phoneNums[i])
-          str = str.replace(
-            phoneNums[i],
-            `<a href="${temp}">${temp}</a>`
-          );
-        }
-      }
-      return str;
+    return str= str.replace(/[(（](\d+)[)）]|(1[^012]\d{9})|(0\d{2,3}-?\d{6,8})/g, (a,b,c,d)=>`<a href='tel:${(d||c||b||a)}'>${(d||c||b||a)}</a>` )
     },
   },
   //生命周期 - 创建完成（可以访问当前this实例）
@@ -236,7 +226,6 @@ margin-bottom: 10px;
 .detail_top_des > span {
   width: 71px;
   height: 22px;
-  background: #75c16d;
   border-top-left-radius: 11px;
   border-bottom-left-radius: 11px;
 
