@@ -116,12 +116,11 @@ export default {
     // 获取验证码
     getSms() {
       let { phone } = this;
-      this.$api.user.getSms("sms_vcode_get", "/?c=api", {
+      this.$api.user.getSms({
         mobile: phone,
       }).then((res) => {
         this.timeShow = true;
         this.countDown();
-        console.log(res);
       });
     },
     countDown() {
@@ -139,7 +138,7 @@ export default {
     // 登录注册
     onsubmit() {
       let { phone, sms, identityNum, identity } = this;
-      this.$api.user.userBind("user_bind", "/?c=api", {
+      this.$api.user.userBind({
         mobile: phone,
         vcode: sms,
       }).then((res) => {
