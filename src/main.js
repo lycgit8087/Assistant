@@ -20,7 +20,6 @@ Vue.config.productionTip = false
 Vue.prototype.$Toast = Toast
 Vue.prototype.$Notify = Notify
 Vue.prototype.$Dialog = Dialog
-
 // if(process.env.NODE_ENV != "development"){
   let vConsole = new Vconsole()
   Vue.use(vConsole)

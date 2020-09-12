@@ -111,17 +111,18 @@ function tryHideLoading() {
 //http response 拦截器
 axios.interceptors.response.use(
   response => {
-      let {config}=response
       const token_time = parseInt(localStorage.getItem("token_time")) ;
       let now_time=Date.parse(new Date())
-      let is_get_token=((token_time-now_time)/60000)>10
+      let is_get_token=((token_time-now_time)/60000)<10&&((token_time-now_time)/60000)>0
       
-      if(!is_get_token&&token_time){
+      if(is_get_token&&token_time){
           api.user.tokenUpdate().then(res=>{
             localStorage.setItem("token",res.token)
             localStorage.setItem("token_time",res.token_expires)
           })
       }
+      tryHideLoading()
+
       if(response.data.response_code==-1){
         let errmessage = response.data.response_msg.toLowerCase()
         if(errmessage.indexOf("token")!=-1){
@@ -139,10 +140,14 @@ axios.interceptors.response.use(
             type: 'warning',
             duration: 3 * 1000
           })
+          
+        return Promise.reject(response)
+
         }      
+      }else{
+        return response.data;
+
       }
-      tryHideLoading()
-    return response.data;
   },
   error => {
     tryHideLoading()

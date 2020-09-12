@@ -1,6 +1,8 @@
 <!-- My -->
 <template>
   <div class="my">
+    <van-nav-bar title="我的" :fixed="true" placeholder />
+
     <div class="my_top" @click="toPlace" > 
       <van-image fit="cover" :src="this.$store.state.userInfo.avatar" />
       <span>{{this.$store.state.userInfo.name}}</span>
@@ -10,7 +12,7 @@
     <div class="my_order">
       <span>订单管理</span>
       <div class="my_order_chlid">
-        <div v-for="(item,index) in orderList" @click="openIt(item.name)" :key="index">
+        <div v-for="(item,index) in orderList"  :key="index">
           <van-image fit="cover" :src="item.url" />
           <span>{{item.title}}</span>
         </div>
@@ -104,7 +106,7 @@ export default {
 <style >
 /* //@import url(); 引入公共css类 */
 html {
-  background: #fbfcfe;
+  background: #fff !important;
   height: 100%;
 }
 body {
@@ -112,7 +114,6 @@ body {
 }
 .my {
   width: 100vw;
-  background: #fbfcfe;
   display: flex;
   flex-direction: column;
 }

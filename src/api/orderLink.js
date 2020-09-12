@@ -33,3 +33,12 @@ export const linkList = payload => {
         data: payload
     })
 }
+
+
+//   下单渠道分享
+
+export const linkShareConfig = payload => {
+    return request("order_links_share_config", "/?c=api", {
+        data: payload
+    })
+}

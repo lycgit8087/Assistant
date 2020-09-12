@@ -62,3 +62,11 @@ export const del = payload => {
         data: payload
     })
 }
+
+
+// 订单导出
+export const orderExport = payload => {
+    return request("order_export", "/?c=api", {
+        data: payload
+    })
+}

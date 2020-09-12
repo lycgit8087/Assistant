@@ -5,7 +5,7 @@
 
     <div class="detail_top">
       <div class="detail_top_des">
-        <p>{{goods}}</p>
+        <van-field class="title-field" :readonly="isReadonly" rows="1" autosize type="textarea"  v-model="goods" :border="false"  />
         <span :style="'background:'+color" >{{status_text}}</span>
       </div>
       <p v-if="orderTime" class="detail_top_time">下单时间：{{orderTime}}</p>
@@ -13,7 +13,7 @@
 
     <!-- 留言 -->
     <van-field
-      readonly
+      :readonly="isReadonly"
       v-model="message"
       border
       rows="1"
@@ -24,21 +24,21 @@
     />
     <div class="people_des">
       <!-- 收件人信息 -->
-      <van-field v-model="name" label="收件人" readonly />
-      <van-field v-model="phone" label="联系方式" readonly />
+      <van-field v-model="name" label="收件人" :readonly="isReadonly" />
+      <van-field v-model="phone" label="联系方式" :readonly="isReadonly" />
       <van-field
         v-model="place"
         rows="2"
         autosize
         label="收货地址"
         type="textarea"
-        readonly
+        :readonly="isReadonly"
         show-word-limit
       />
     </div>
 
     <!-- 快递单号 -->
-    <van-field v-model="exnumber" clearable label="快递单号" placeholder="快递单号" right-icon="scan" />
+    <van-field v-model="exnumber" :readonly="isReadonly||identity!=2" clearable label="快递单号" placeholder="快递单号" right-icon="scan" />
 
     <!-- 快递公司 -->
 
@@ -57,6 +57,8 @@
         <p class="info-title" v-html="item.remark" ></p>
       </van-step>
     </van-steps>
+
+      <van-button v-if="!isReadonly" class="edit-btn" type="info" @click="orderEdit">保存</van-button>
   </div>
 </template>
 
@@ -73,6 +75,7 @@ export default {
   data() {
     //这里存放数据
     return {
+      isReadonly:true,
       message: "", //留言
       place: "", //收件人地址
       name: "", //收件人名字
@@ -92,6 +95,8 @@ export default {
       ],
       exName: "",
       exTag: "",
+      identity:0,
+      status:0
     };
   },
   //监听属性 类似于data概念
@@ -105,7 +110,7 @@ export default {
   //方法集合
   methods: {
     getDetail() {
-      let { orderid, type_arr } = this;
+      let { orderid, type_arr ,isReadonly} = this;
       this.$api.order
         .detail({
           orderid: orderid,
@@ -121,14 +126,47 @@ export default {
           this.ex_info = detail.ex_info;
           this.exnumber = detail.exnumber;
           this.c=detail.time
+          this.identity=detail.identity
+          this.status=detail.status
+           
+          if(detail.status>1){
+            isReadonly=true
+          }else{
+            if(detail.identity==0){
+              isReadonly=true
+            }else{
+              
+              isReadonly=false
+            }
+          }
+          this.isReadonly=isReadonly
           let colorNum=type_arr.findIndex(itme=>itme.type==detail.status)
           let color=colorNum==-1?"#E96960":type_arr[colorNum].color
-          console.log(colorNum,color)
+          
           this.color=color
           detail.ex_info.forEach(item=>{
             item.remark=this.selectPhoneNumber(item.remark)
           })
         });
+    },
+
+    // 订单编辑
+    orderEdit(){
+      let {message,name,phone,place,exnumber,orderid,goods,extag}=this
+     
+      this.$api.order.edit({
+        orderid:orderid,
+        name:name,
+        mobile:phone,
+        goods:goods,
+        address:place,
+        notes:message,
+        exnumber:exnumber,
+      }).then(res=>{
+          console.log(res)
+          this.$Toast.success("保存成功");
+
+      })
     },
 
     // 匹配快递公司
@@ -139,7 +177,6 @@ export default {
           exnumber: exnumber,
         })
         .then((res) => {
-          console.log(res);
           let listData = res.data;
           if(listData.length){
             listData=listData[0]
@@ -247,5 +284,16 @@ margin-bottom: 10px;
   width: 100%;
   margin-top: 10px;
   margin-bottom: 10px;
+}
+.edit-btn{
+  width: 194px;
+  transform: translate(-50%,-0%);
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+}
+.title-field{
+  font-size: 16px !important;;
+  padding: 0 !important;
 }
 </style>

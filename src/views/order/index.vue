@@ -1,16 +1,18 @@
 <template>
   <div class="Order">
     <!-- :sticky="true" :offset-top="45" -->
+    <van-nav-bar title="订单" :fixed="true" placeholder right-text="导出" @click-right="rightClick"></van-nav-bar>
+
     <van-tabs v-model="active" @change="changeActive">
       <van-tab v-for="(item,index) in tabList" :key="index" :title="item.title" :info="item.info">
         <div class="tabListChild">
           <div class="tabListChildEdit">
             <van-search v-model="keyword" class="listsearch" placeholder="请输入搜索关键词" />
-            <p class="tabListChildFiler" @click="peopleToggle">
+            <p v-if="identity!=0" class="tabListChildFiler" @click="peopleToggle">
               <span>筛选</span>
-              <van-icon name="filter-o" color="#FFA726" />
+              <van-icon name="filter-o" :color="isFilter?'#FFA726':'#323233'" />
             </p>
-            <van-button type="info" size="small" @click="popupToggle">批量操作</van-button>
+            <van-button v-if="identity!=0" type="info" size="small" @click="popupToggle">批量操作</van-button>
           </div>
           <van-pull-refresh
             class="refresh-class"
@@ -54,7 +56,7 @@
               </div>
             </van-list>
 
-            <van-empty v-if="!isloading&&item.listData.length==0" description="暂无此类数据" />
+            <van-empty v-if="!isloading&&item.listData.length==0" description="暂无数据" />
           </van-pull-refresh>
         </div>
       </van-tab>
@@ -70,7 +72,7 @@
           <van-button round type="info" size="mini" @click="checkAll">{{isCheckAll?'反选':'全选'}}</van-button>
           <p>已选择{{checkOrder}}个订单</p>
         </div>
-        <div class="popuplistView">
+        <div class="popuplistView" v-if="decidedList.length!=0">
           <van-list>
             <div
               class="popupView_child"
@@ -92,8 +94,10 @@
           </van-list>
         </div>
 
+        <van-empty v-else description="暂无待确定订单" />
+
         <!-- 底部操作按钮 -->
-        <div class="popupfooter">
+        <div class="popupfooter" v-if="decidedList.length!=0">
           <van-button type="info" class="sureclass" @click="setSure">确定</van-button>
           <van-button type="danger" class="deleclass" @click="delOrder">删除</van-button>
         </div>
@@ -103,7 +107,7 @@
     <!--  选择供应商-->
     <van-popup v-model="peopleShow" position="bottom" closeable>
       <div class="pview">
-        <p class="pview_title">请选择供应商</p>
+        <p class="pview_title">{{btnType==1?'请选择供应商':'请选择代理商'}}</p>
         <!-- 搜索按钮 -->
         <van-search class="poeple_search" v-model="peoplesearch" placeholder="请输入搜索关键词" />
         <div class="allpeople">
@@ -123,10 +127,10 @@
                   @click="agentCheck(index,lindex)"
                 >
                   <template #right-icon>
-                    <div class="iconview" >
+                    <div class="iconview">
                       <van-icon v-if="litem.isCheck" name="checked" color="#E96960" size="20" />
 
-                <van-icon v-else name="passed" size="20" />
+                      <van-icon v-else name="passed" size="20" />
                     </div>
                   </template>
                 </van-cell>
@@ -134,22 +138,71 @@
             </div>
           </div>
 
-          <van-button type="info" @click="sureAgentCheck" >确定</van-button>
+          <van-button v-if="peopleList.length!=0" type="info" @click="sureAgentCheck">确定</van-button>
         </div>
       </div>
     </van-popup>
 
     <!-- 右侧固定按钮 -->
 
-    <div class="fix-right">
+    <div class="fix-right" v-if="bthArr.length!=1">
       <div class="fix-right-child">
         <div
           :class="[item.cls,index==btnNum?'active-bth':'']"
           v-for="(item,index) in bthArr"
-          @click="checkBtn(index)"
+          @click="checkBtn(item.type,index)"
         >{{item.text}}</div>
       </div>
     </div>
+
+    <!-- 右侧导出 -->
+    <van-popup v-model="rightShow" position="right">
+      <div class="export-view">
+        <p class="export-title">导出筛选</p>
+
+        <!-- 选择用户类型· -->
+        <div class="export-child">
+          <span>用户订单类型</span>
+          <div class="export-child-btn">
+            <van-button
+              @click="userBtnClick(index)"
+              v-for="(item,index) in userTypeArr"
+              :key="index"
+              :type="userTypeIndex==index?'info':'default'"
+            >{{item.text}}</van-button>
+          </div>
+        </div>
+        <!-- 选择时间 -->
+        <div class="export-child">
+          <span>时间区间</span>
+          <div class="time-view" @click="timeShow = true" >
+              <van-button round size="small">{{date.length==0?'开始时间':dateTimeObj.start}}</van-button>
+              <span class="longspan" ></span>
+              <van-button round size="small">{{date.length==0?'结束时间':dateTimeObj.end}}</van-button>
+
+
+          </div>
+        </div>
+
+        <!-- 订单状态 -->
+        <div class="export-child">
+          <span>订单状态</span>
+          <div class="export-child-btn">
+            <van-button
+              @click="orderTypeClick(index)"
+              v-for="(item,index) in orderTypeArr"
+              :key="index"
+              :type="item.isCheck?'info':'default'"
+            >{{item.text}}</van-button>
+          </div>
+        </div>
+
+
+        <van-button class="order-btn" type="info" @click="orderExport" >导出订单</van-button>
+      </div>
+    </van-popup>
+
+    <van-calendar v-model="timeShow" :show-subtitle="false" :min-date="minDate" :max-date="maxDate" type="range" @confirm="onConfirm" />
   </div>
 </template>
 
@@ -161,13 +214,17 @@ export default {
   data() {
     return {
       msg: "Welcome to Your Vue.js App",
+      identity: 0,
       date: "",
       popupShow: false,
+      btnType: 0,
       keyword: "",
       active: 0,
       peoplesearch: "",
       isloading: false,
       btnNum: 0,
+      minDate: new Date(2008, 1, 1),
+      maxDate: new Date(2050, 6, 31),
       bthArr: [
         { text: "购买的订单", cls: "onebth", type: 0 },
         { text: "代理的订单", cls: "twobth", type: 1 },
@@ -237,17 +294,30 @@ export default {
       decidedPageNum: 1,
       agetnName: "", //代理商名称
       peopleList: [], //筛选列表
-      ltagArr:[]
+      oldPeopleList: [],
+      ltagArr: [],
+      rightShow: false,
+      userTypeArr: [
+        { text: "我代理的订单", type: 1 },
+        { text: "我供应的订单", type: 2 },
+      ],
+      userTypeIndex: 0,
+      date: "",
+      timeShow: false,
+      orderTypeArr: [
+        // { text: "全部", isCheck: false, type: "0,1,2" },
+        { text: "待发货", isCheck: false, type: "0" },
+        { text: "已发货", isCheck: false, type: "1" },
+        { text: "已签收", isCheck: false, type: "2" },
+      ],
+      dateTimeObj:{}
     };
   },
   created() {
-    
-    if ( JSON.stringify(this.$store.state.userInfo)!="{}" ) {
-      console.log(this.$store.state.userInfo)
+    if (JSON.stringify(this.$store.state.userInfo) != "{}") {
+      console.log(this.$store.state.userInfo);
       let { identity } = this.$store.state.userInfo;
-      let { btnNum, bthArr } = this;
-      btnNum =identity == 3 ? 2 : bthArr.findIndex(item => item.type == identity);
-      this.btnNum = btnNum;
+      this.setBtnData(identity);
       this.getList();
     } else {
       this.getInfo();
@@ -264,11 +334,18 @@ export default {
       let arr = this.decidedList.filter((item) => item.is_sure);
       return decidedList.length == arr.length;
     },
+    isFilter() {
+      let { ltagArr } = this;
+      return ltagArr.length > 0;
+    },
   },
 
   watch: {
     keyword(val) {
       this.debounce(this);
+    },
+    peoplesearch(val) {
+      this.pupupDebounce(this);
     },
   },
   methods: {
@@ -276,16 +353,48 @@ export default {
       this.$api.user.userInfo().then((res) => {
         this.$store.dispatch("USER_INFO", res.data);
         let identity = res.data.identity;
-        let { btnNum, bthArr } = this;
-        btnNum =
-          identity == 3 ? 2 : bthArr.findIndex((item) => item.type == identity);
-        
-        this.btnNum = btnNum;
+        this.setBtnData(identity);
         this.getList();
       });
     },
+
     formatDate(date) {
-      return `${date.getMonth() + 1}/${date.getDate()}`;
+      return `${date.getFullYear()-1}/${date.getMonth() + 1}/${date.getDate()}`;
+    },
+
+    onConfirm(date) {
+      let [start, end] = date;
+      this.timeShow = false;
+      this.date = `${this.formatDate(start)} - ${this.formatDate(end)}`;
+      this.dateTimeObj={
+        start:this.formatDate(start),
+        end:this.formatDate(end)
+      }
+    },
+    // 设置右侧显示的状态
+    setBtnData(identity) {
+      let { btnNum, bthArr, btnType } = this;
+      bthArr =
+        identity == 3 ? bthArr : bthArr.filter((item) => item.type == identity||item.type ==0);
+      btnNum =
+        identity == 3 ? 2 : bthArr.findIndex((item) => item.type == identity);
+      btnType = identity == 3 ? 2 : bthArr[identity].type;
+      this.btnNum = btnNum;
+      this.btnType = btnType;
+      this.bthArr = bthArr;
+      this.identity = identity;
+    },
+
+    rightClick() {
+      let{btnType,userTypeIndex}=this
+      userTypeIndex=btnType==3||btnType==2?1:0
+      this.userTypeIndex=userTypeIndex
+      this.rightShow = true;
+    },
+    // 订单状态选择
+    orderTypeClick(index) {
+      let { orderTypeArr } = this;
+      this.orderTypeArr[index].isCheck = !orderTypeArr[index].isCheck;
     },
 
     // 防抖
@@ -293,7 +402,11 @@ export default {
       // do something，这里this不指向Vue实例,用vm传入
       vm.tabList[vm.active].pageNum = 1;
       vm.getList();
-    }, 500),
+    }, 1000),
+    pupupDebounce: util.debounce((vm) => {
+      // do something，这里this不指向Vue实例,用vm传入
+      vm.searchPopup();
+    }, 1000),
 
     // 切换tab
     changeActive() {
@@ -303,51 +416,70 @@ export default {
       }
     },
     // 选择身份
-    checkBtn(index) {
-      let {bthArr,tabList}=this
+    checkBtn(type, index) {
+      let { bthArr, tabList } = this;
       this.btnNum = index;
-      tabList.forEach(item=>{
-        item.pageNum=1
-        item.info=""
-        item.listData=[]
-        item.finished=false
-      })
+      this.btnType = type;
+      tabList.forEach((item) => {
+        item.pageNum = 1;
+        item.info = "";
+        item.listData = [];
+        item.finished = false;
+      });
+      this.tabList = tabList;
       this.getList();
     },
 
-     //筛选
+    //筛选
     peopleToggle() {
-      let {btnNum}=this
-      if(btnNum==1){
-        this.getSupplierList()
-      }else{
-      this.getAgentDetail();
-
+      let { btnType } = this;
+      if (btnType == 1) {
+        this.getSupplierList();
+      } else {
+        this.getAgentDetail();
       }
       this.peopleShow = !this.peopleShow;
     },
-    // 获取供应商列表
 
-    getSupplierList(){
-      let {peopleList,peoplesearch}=this
-      this.$api.supplier.list({
-        name:peoplesearch
-      }).then(res=>{
-        let list=res.data
-        list.forEach(item=>{
-            item.link_data.forEach(litem=>{
-              litem.isCheck=false
-            })
-          })
-        this.peopleList=list
-        console.log(list)
-      })
+    // 搜索供应商或代理商
+    searchPopup() {
+      let { peopleList, peoplesearch, oldPeopleList } = this;
+      if (peoplesearch.length != 0) {
+        this.peopleList = peopleList.filter(
+          (item) => item.name.indexOf(peoplesearch) != -1
+        );
+      } else {
+        this.peopleList = oldPeopleList;
+      }
+    },
+    // 获取供应商列表
+    getSupplierList() {
+      let { peopleList, peoplesearch } = this;
+      this.$api.supplier
+        .list({
+          name: peoplesearch,
+        })
+        .then((res) => {
+          let list = res.data;
+          list.forEach((item) => {
+            item.link_data.forEach((litem) => {
+              litem.isCheck = false;
+            });
+          });
+          this.peopleList = list;
+          this.oldPeopleList = list;
+        });
+    },
+
+    // 用户类型选择
+    userBtnClick(index) {
+      this.userTypeIndex = index;
     },
 
     // 获取代理商列表
     getAgentDetail() {
       let { agetnName, peopleList } = this;
-      if(peopleList.length!=0)return
+      if (peopleList.length != 0) return;
       this.$api.agent
         .list({
           is_link: 1,
@@ -356,50 +488,83 @@ export default {
         .then((res) => {
           let list = res.data;
           peopleList = [];
-          list.forEach(item=>{
-            item.link_data.forEach(litem=>{
-              litem.isCheck=false
-            })
-          })
+          list.forEach((item) => {
+            item.link_data.forEach((litem) => {
+              litem.isCheck = false;
+            });
+          });
           this.peopleList = list;
+          this.oldPeopleList = list;
         });
     },
     // 选择代理商或供应商
-    agentCheck(index,lindex){
-      let {peopleList}=this
-      this.peopleList[index].link_data[lindex].isCheck=!peopleList[index].link_data[lindex].isCheck
+    agentCheck(index, lindex) {
+      let { peopleList } = this;
+      this.peopleList[index].link_data[lindex].isCheck = !peopleList[index]
+        .link_data[lindex].isCheck;
+    },
+    // 导出订单
+    
+    orderExport(){
+      let {userTypeArr,orderTypeArr,userTypeIndex,dateTimeObj,date}=this
+     
+      let orderIdArr=[]
+      orderTypeArr.forEach(item=>{
+        if(item.isCheck){
+          orderIdArr.push(item.type)
+        }
+      })
+       if(date.length==0){
+        this.$Toast("请选择起止时间")
+        return
+      }
+      if(orderIdArr.length==0){
+        this.$Toast("请选择要导出的订单类型")
+        return
+      }
+      this.$api.order.orderExport({
+        utype:userTypeArr[userTypeIndex].type,
+        status:orderIdArr.join(","),
+        start_time:dateTimeObj.start,
+        end_time:dateTimeObj.end
+      }).then(res=>{
+        console.log(res.data)
+        var a = document.createElement('a');
+            a.target = "_self";
+            a.href =res.data ;
+            a.click();
+      })
+
     },
 
     // 确定选择代理商或供应商
-    sureAgentCheck(){
-      let {peopleList}=this
-      let {ltagArr}=this
-      ltagArr=[]
-      peopleList.forEach(item=>{
-        item.link_data.forEach(litem=>{
-          if(litem.isCheck){
-            ltagArr.push(litem.ltag)
-
+    sureAgentCheck() {
+      let { peopleList } = this;
+      let { ltagArr } = this;
+      ltagArr = [];
+      peopleList.forEach((item) => {
+        item.link_data.forEach((litem) => {
+          if (litem.isCheck) {
+            ltagArr.push(litem.ltag);
           }
-        })
-      })
-      this.ltagArr=ltagArr
-      this.peopleShow=false
-      this.getList()
-
+        });
+      });
+      this.ltagArr = ltagArr;
+      this.peopleShow = false;
+      this.getList();
     },
 
     // 订单列表
     getList() {
-      let { keyword, tabList, active, type_arr,btnNum,ltagArr } = this;
+      let { keyword, tabList, active, type_arr, btnType, ltagArr } = this;
       this.isloading = true;
       this.$api.order
         .list({
-          type:btnNum,
+          type: btnType,
           keyword: keyword,
           status: tabList[active].type,
           page: tabList[active].pageNum,
-          ltag:ltagArr.join(",")
+          ltag: ltagArr.join(","),
         })
         .then((res) => {
           let list = res.data;
@@ -445,10 +610,10 @@ export default {
 
     // 获取确定订单
     getSureList() {
-      let { decidedList, decidedPageNum,btnNum } = this;
+      let { decidedList, decidedPageNum, btnType } = this;
       this.$api.order
         .list({
-          type:btnNum,
+          type: btnType,
           status: 0,
           page: decidedPageNum,
         })
@@ -537,8 +702,6 @@ export default {
         query: { orderid: orderid },
       });
     },
-
-   
   },
 };
 </script>
@@ -591,6 +754,9 @@ export default {
   padding: 15px;
   box-sizing: border-box;
   align-items: center;
+}
+.export-child .van-cell {
+  padding: 10px 0;
 }
 .listChild {
   width: 100%;
@@ -683,7 +849,7 @@ export default {
   color: #202020;
 }
 
-.fix-right{
+.fix-right {
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -692,10 +858,10 @@ export default {
   z-index: 55;
   width: 90px;
 }
-.fix-right-child{
+.fix-right-child {
   position: relative;
 }
-.fix-right-child>div{
+.fix-right-child > div {
   width: 90px;
   height: 30px;
   font-size: 12px;
@@ -712,19 +878,18 @@ export default {
   right: -55%;
   position: absolute;
   opacity: 0.4;
-
 }
-.active-bth{
+.active-bth {
   right: -10% !important;
   opacity: 1 !important;
 }
-.onebth{
+.onebth {
   top: 0;
 }
-.twobth{
+.twobth {
   top: 40px;
 }
-.therebth{
+.therebth {
   top: 80px;
 }
 
@@ -762,6 +927,13 @@ export default {
   justify-content: space-around;
   width: 100%;
 }
+.longspan{
+  display: flex;
+  width: 30px;
+  height: 2px;
+  background: #202020;
+  margin: 0 10px;
+}
 .sureclass {
   width: 193px;
 }
@@ -770,7 +942,7 @@ export default {
 }
 .pview {
   width: 100%;
-  max-height: 590px;
+  max-height: 80vh;
   display: flex;
   flex-direction: column;
   padding: 15px;
@@ -799,9 +971,10 @@ export default {
 .allpeoplechild {
   display: flex;
   align-items: flex-start;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
+  padding: 10px 0;
 }
-.allpeoplechild .van-image {
+.allpeoplechild > .van-image {
   width: 44px;
   height: 44px;
   border-radius: 11px;
@@ -836,5 +1009,53 @@ export default {
   display: flex;
   align-items: center;
   height: 100%;
+}
+.export-view {
+  width: 80vw;
+  height: 100vh;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 20px;
+  box-sizing: border-box;
+}
+
+.export-title {
+  font-size: 18px;
+  font-family: PingFangSC-Medium, PingFang SC;
+  font-weight: 500;
+  color: #202020;
+  margin-bottom: 26px;
+  margin-top: 40px;
+}
+.export-child {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-bottom: 15px;
+}
+.export-child > span {
+  font-size: 12px;
+  font-family: PingFangSC-Regular, PingFang SC;
+  font-weight: 400;
+  color: #878b94;
+  margin-bottom: 10px;
+}
+.export-child-btn {
+  display: flex;
+  flex-wrap: wrap;
+}
+.export-child-btn > button {
+  margin-right: 10px;
+  margin-bottom: 10px;
+}
+.order-btn{
+  width: 193px;
+  margin-top: 200px;
+}
+.time-view{
+  display: flex;
+  align-items: center;
 }
 </style>

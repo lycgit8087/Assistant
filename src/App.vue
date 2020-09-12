@@ -16,6 +16,8 @@ export default {
     return {};
   },
   created() {
+    console.log(this.$store.state.wxurl)
+    
     this.useParams();
     localStorage.setItem("indexUrl", url+"?ac=index");
   },
@@ -28,9 +30,9 @@ export default {
         this.$router.push({ name: "home" });
         localStorage.setItem(
           "token",
-          "NHdFMXVBZFdVdGRpellYQVNPSTU2OU9HSFY1S21jMkYvNld5Ly9QeUpQVEJvSEdNbnpyWEtjNC8vZzFTUzkzR0ZOdjczU2hWc09OeGh1SjJCdjZmOFhYQnBhRDJ4Q0hIUk5pN2xFZnpUWlprRGdkWWFEQlBPbGplYjArTHBMamJzb1htbjlTbXJBUFRadnZYcHpRd1ZXZi95Q08vUXJwU3BtT3NYYVNYbTltajcvazh6VUhadU5QWVJNWTJPUjhreEVFbEJXNzFHY1ZqeVZnS2xpWmtTQzdXVVF2WDB1dmtNaDFwY3J3bGJnM2pKZVNPUHBQK1NYejQ4L3g5MUxlem4xRGN2WTJmVGlPYzViRFVYRkpCQURhL2dKcTF1TFFDSkpKcCtiVk1UeDMyM3l5THVqa0RRS3dKVXBJT05waW80OFNlMnJXYnRSWFIxMFVUcE1yK1ZMbmN3RmQ3UDQ2YkR3aXVnOTRwRVhPSEYxWXBEVzNaTmF0KzhoemZuN2d1UnBKVS9HTURpbUc1R1BUelZwSUtBL3hya1liUHNSdE5TanErNzcwRnYxdk9JOStwTEowU0ZncEY2TW5kckxCSmdyMVVBdWVyVzRHRnlZaGd2MHdrR3JPTjJYYUhLTlE1b2FXL3hwdUNLZDQ9"
+          "NHdFMXVBZFdVdGRpellYQVNPSTU2OU9HSFY1S21jMkYvNld5Ly9QeUpQVEJvSEdNbnpyWEtjNC8vZzFTUzkzR0ZOdjczU2hWc09OeGh1SjJCdjZmOFhYQnBhRDJ4Q0hIUk5pN2xFZnpUWlprRGdkWWFEQlBPbGplYjArTHBMamJzb1htbjlTbXJBUFRadnZYcHpRd1ZXZi95Q08vUXJwU3BtT3NYYVNYbTltajcvazh6VUhadU5QWVJNWTJPUjhreEVFbEJXNzFHY1ZqeVZnS2xpWmtTQzdXVVF2WDB1dmtNaDFwY3J3bGJnM2pKZVNPUHBQK1NYejQ4L3g5MUxlem4xRGN2WTJmVGlPYzViRFVYRkpCQURhL2dKcTF1TFFDSkpKcCtiVk1UeDMyM3l5THVqa0RRS3dKVXBJT05waW80OFNlMnJXYnRSWFIxMFVUcE1yK1ZMbmN3RmQ3UDQ2YkR3aXVnOTRwRVhPSEYxWXBEVzNaTmF0KzhoemZuN2d1UnBKVS9HTURpbUc1R1BUelZwSUtBL3hya1liUHNSdE5TanErNzcwRnYxdk9JOStwTEowU0ZncEY2TW5kckxCSmdyMVVBdWVyVzRHRnlZaGd2MHdrR2dNdUlNbVlLOXJ1TlhIM2t6bG1YMkU9"
         );
-        let token_time = 1709566995000;
+        let token_time = 1599898342000;
         localStorage.setItem("token_time", token_time);
         return;
       }
@@ -40,6 +42,8 @@ export default {
         { ac: "index", name: "home" },
         { ac: "order", name: "order" },
         { ac: "personal", name: "my" },
+        { ac: "orderlink", name: "order-detail" },
+
       ];
       let pageNum = pageUrl.findIndex((item) => item.ac == params.ac);
       if (token) {
@@ -63,12 +67,19 @@ export default {
     },
     // 设置并且跳转
     setToken(data, name = "home") {
+      data.token=data.token.replace(/№/g,"=")
       localStorage.setItem("token", data.token);
       localStorage.setItem("token_time", data.token_expires);
       if (data.mobile_bind == 0) {
         this.$router.push({ name: "login" });
       } else {
+        if(name=="order-detail"){
         this.$router.push({ name: name });
+
+        }else{
+        this.$router.push({ name: name,query: { ltag: data.ltag }});
+
+        }
       }
     },
 
@@ -103,6 +114,7 @@ export default {
       } else {
         nameres = url;
       }
+      console.log(nameres)
       // 返回结果
       return nameres;
     },
@@ -181,5 +193,9 @@ body {
   bottom: 3vh;
   left: 50%;
   transform: translate(-50%, 0);
+}
+.blue-color{
+  color: #0076FF;
+  text-decoration: underline;
 }
 </style>

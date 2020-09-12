@@ -27,6 +27,7 @@
             <p :class="ditem.rstatus==0?'rclass':'gclass'">{{ditem.rstatus==0?"未注册":"已注册"}}</p>
           </div>
           <template #right>
+            <div class="editView" >
             <van-button
               @click="setBtnType(0)"
               square
@@ -35,18 +36,19 @@
               class="delete-button"
             />
             <van-button @click="setBtnType(1)" square type="primary" text="编辑" />
+            </div>
           </template>
         </van-swipe-cell>
       </div>
     </van-index-bar>
 
     <div class="fix-btn">
-      <van-button type="info" class="addbtn" @click="show=true">添加代理商</van-button>
+      <van-button type="info" class="addbtn" @click="addIt">添加代理商</van-button>
     </div>
     <van-popup v-model="show" closeable @close="closePopup">
       <div class="addpeople flex-align-center">
         <van-form validate-first @submit="onsubmit">
-          <p class="add-people-title">添加代理商</p>
+          <p class="add-people-title">{{editLid==0?'添加代理商':'编辑代理商'}}</p>
           <p class="add-people-text">代理商名称</p>
           <van-field
             v-model="username"
@@ -165,6 +167,12 @@ export default {
       this.list = list;
     },
 
+    // 弹出
+    addIt(){
+      this.editLid=0
+      this.show=true
+    },
+
     // 代理商添加
     onsubmit() {
       let { editLid } = this;
@@ -209,9 +217,10 @@ export default {
         })
         .then((res) => {
           this.$Toast.success("编辑成功");
-          this.show = false;
-          this.editLid = 0;
+          
           setTimeout(() => {
+            this.show = false;
+          this.editLid = 0;
             this.getList();
           }, 500);
         });
@@ -221,13 +230,14 @@ export default {
     beforeClose({ name, position, instance }) {
       let { btnType } = this;
       if (position == "right") {
-        console.log(btnType);
+        console.log(btnType,name);
         if (btnType == 0) {
           this.$Dialog
             .confirm({
               message: "确定删除吗？",
             })
             .then(() => {
+              this.del(name)
               instance.close();
             })
             .catch(() => {
@@ -243,11 +253,13 @@ export default {
     editPeople(editLid) {
       let { list } = this;
       this.editLid = editLid;
-
+      console.log(list,editLid)
       this.show = true;
-      let people = {};
+      let people = [];
       list.forEach((item, index) => {
+        if(people.length==0){
         people = item.data.filter((ditem) => ditem.lid == editLid);
+        }
       });
       people = people[0];
       this.username = people.name;
@@ -260,6 +272,7 @@ export default {
 
     // 删除代理商
     del(lid) {
+      console.log(lid)
       let { list } = this;
       this.$api.agent
         .del({
@@ -404,5 +417,12 @@ export default {
 
 .addbtn {
   width: 255px;
+}
+.editView{
+  display: flex;
+  height: 100%;
+}
+.editView>button{
+  width: 50%;
 }
 </style>
