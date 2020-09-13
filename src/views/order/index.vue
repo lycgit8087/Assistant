@@ -8,7 +8,7 @@
         <div class="tabListChild">
           <div class="tabListChildEdit">
             <van-search v-model="keyword" class="listsearch" placeholder="请输入搜索关键词" />
-            <p v-if="identity!=0" class="tabListChildFiler" @click="peopleToggle">
+            <p v-if="identity!=0" class="tabListChildFiler" @click="peopleToggle(0)">
               <span>筛选</span>
               <van-icon name="filter-o" :color="isFilter?'#FFA726':'#323233'" />
             </p>
@@ -98,7 +98,7 @@
 
         <!-- 底部操作按钮 -->
         <div class="popupfooter" v-if="decidedList.length!=0">
-          <van-button type="info" class="sureclass" @click="setSure">确定</van-button>
+          <van-button type="info" class="sureclass" @click="peopleToggle(1)">确定</van-button>
           <van-button type="danger" class="deleclass" @click="delOrder">删除</van-button>
         </div>
       </div>
@@ -310,7 +310,8 @@ export default {
         { text: "已发货", isCheck: false, type: "1" },
         { text: "已签收", isCheck: false, type: "2" },
       ],
-      dateTimeObj:{}
+      dateTimeObj:{},
+      filterNum:0,//0 筛选 1 确认订单
     };
   },
   created() {
@@ -431,13 +432,19 @@ export default {
     },
 
     //筛选
-    peopleToggle() {
-      let { btnType } = this;
+    peopleToggle(index) {
+      let { btnType,decidedList } = this;
+      let orderArr = decidedList.filter((item) => item.is_sure == true);
+      if (orderArr.length == 0&&index==1) {
+        this.$Toast("请选择待确定订单");
+        return;
+      }
       if (btnType == 1) {
         this.getSupplierList();
       } else {
         this.getAgentDetail();
       }
+      this.filterNum=index
       this.peopleShow = !this.peopleShow;
     },
 
@@ -499,9 +506,22 @@ export default {
     },
     // 选择代理商或供应商
     agentCheck(index, lindex) {
-      let { peopleList } = this;
-      this.peopleList[index].link_data[lindex].isCheck = !peopleList[index]
+      let { peopleList,filterNum } = this;
+      console.log(filterNum)
+      if(filterNum==0){
+         this.peopleList[index].link_data[lindex].isCheck = !peopleList[index]
         .link_data[lindex].isCheck;
+      }else{
+        peopleList.forEach((item,index)=>{
+          item.link_data.forEach(fitem=>{
+            fitem.isCheck=false
+          })
+        })
+        peopleList[index].link_data[lindex].isCheck=!peopleList[index]
+        .link_data[lindex].isCheck
+        this.peopleList=peopleList
+      }
+     
     },
     // 导出订单
     
@@ -539,9 +559,10 @@ export default {
 
     // 确定选择代理商或供应商
     sureAgentCheck() {
-      let { peopleList } = this;
+      let { peopleList ,filterNum} = this;
       let { ltagArr } = this;
-      ltagArr = [];
+      if(filterNum==0){
+         ltagArr = [];
       peopleList.forEach((item) => {
         item.link_data.forEach((litem) => {
           if (litem.isCheck) {
@@ -552,6 +573,10 @@ export default {
       this.ltagArr = ltagArr;
       this.peopleShow = false;
       this.getList();
+      }else{
+        this.setSure()
+      }
+     
     },
 
     // 订单列表
@@ -639,21 +664,28 @@ export default {
 
     //确认订单
     setSure() {
-      let { decidedList } = this;
+      let { decidedList,peopleList } = this;
       let orderArr = decidedList.filter((item) => item.is_sure == true);
-      if (orderArr.length == 0) {
-        this.$Toast("请选择待确定订单");
-        return;
-      }
       let orderId = orderArr.map((item) => item.orderid);
+      let ltag=[]
+        peopleList.forEach(item=>{
+          item.link_data.forEach(litem=>{
+            if(litem.isCheck){
+              ltag.push(litem.ltag)
+            }
+          })
+        })
       this.$api.order
         .edit({
           type: 1,
           orderid: orderId.join(","),
+          ltag:ltag.join(",")
         })
         .then((res) => {
           this.$Toast.success("已确认");
           this.decidedPageNum = 1;
+          this.peopleShow=false
+          this.decidedList=decidedList.filter(item=>item.is_sure==false)
           this.getSureList();
         });
     },
