@@ -4,11 +4,8 @@ import api from '../api'
 import qs from 'qs'
 import Vue from 'vue';
 let vm = new Vue();
-// console.log(vm.$loading)
 
 let requestCount = 0;
-let loadingInstance = null
-let timer;
 const root = process.env.API_ROOT;
 axios.defaults.retry = 4;
 axios.defaults.retryDelay = 1000;
@@ -50,13 +47,7 @@ const errorHandler = error => {
 //http request 拦截器
 axios.interceptors.request.use(
   config => {
-    // console.log(config.headers.action)
     if(config.headers.action!="token_get"&&requestCount === 0&&config.headers.action!="qrcode_get"){
-        // loadingInstance=  Toast.loading({
-        //     message: '加载中...',
-        //     forbidClick: true,
-        //     duration:0
-        //   })
           vm.$loading.show()
     }
     requestCount++
@@ -100,16 +91,11 @@ axios.interceptors.request.use(
 function tryHideLoading() {
   requestCount-- 
   //采用setTimeout是为了解决一个请求结束后紧接着有另一请求发起导致loading闪烁的问题
-  timer = setTimeout(() => {    
+  
     if (requestCount === 0) {
       vm.$loading.hide()
-      // if(loadingInstance){
-      //   loadingInstance.clear()
-      //   clearTimeout(timer)
-      // }
-     
     }
-  })
+  
 }
 
 //http response 拦截器
@@ -118,7 +104,6 @@ axios.interceptors.response.use(
       const token_time = parseInt(localStorage.getItem("token_time")) ;
       let now_time=Date.parse(new Date())
       let is_get_token=((token_time-now_time)/60000)<10&&((token_time-now_time)/60000)>0
-      
       if(is_get_token&&token_time){
           api.user.tokenUpdate().then(res=>{
             localStorage.setItem("token",res.token)
@@ -126,7 +111,6 @@ axios.interceptors.response.use(
           })
       }
       tryHideLoading()
-
       if(response.data.response_code==-1){
         let errmessage = response.data.response_msg.toLowerCase()
         if(errmessage.indexOf("token")!=-1){

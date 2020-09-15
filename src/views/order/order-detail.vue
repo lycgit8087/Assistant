@@ -164,7 +164,7 @@ export default {
         exnumber:exnumber,
       }).then(res=>{
           console.log(res)
-          this.$Toast.success("保存成功");
+          this.$Notify({ type: 'success', message: '保存成功' });
 
       })
     },

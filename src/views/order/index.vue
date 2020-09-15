@@ -393,7 +393,7 @@ export default {
     };
   },
   created() {
-    // this.$loading.show();
+
     if (JSON.stringify(this.$store.state.userInfo) != "{}") {
       console.log(this.$store.state.userInfo);
       let { identity } = this.$store.state.userInfo;
@@ -769,7 +769,7 @@ export default {
           ltag: ltag.join(","),
         })
         .then((res) => {
-          this.$Toast.success("已确认");
+          this.$Notify({ type: 'success', message: '订单已确认' });
           this.decidedPageNum = 1;
           this.peopleShow = false;
           this.decidedList = decidedList.filter(
@@ -799,7 +799,7 @@ export default {
             })
             .then((res) => {
               console.log(res);
-              this.$Toast.success("删除成功");
+              this.$Notify({ type: 'success', message: '删除成功' });
               this.decidedPageNum = 1;
               this.getSureList();
             });

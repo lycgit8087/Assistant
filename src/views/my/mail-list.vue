@@ -198,7 +198,7 @@ export default {
           mobile: phone,
         })
         .then((res) => {
-          this.$Toast.success("添加成功");
+          this.$Notify({ type: 'success', message: '添加成功' });
           this.show = false;
           setTimeout(() => {
             this.getList();
@@ -216,7 +216,7 @@ export default {
           mobile: phone,
         })
         .then((res) => {
-          this.$Toast.success("编辑成功");
+          this.$Notify({ type: 'success', message: '编辑成功' });
           
           setTimeout(() => {
             this.show = false;

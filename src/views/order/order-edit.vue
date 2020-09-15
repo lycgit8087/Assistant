@@ -214,7 +214,7 @@ export default {
       };
       console.log(params);
       this.$api.order.online(params).then((res) => {
-        this.$Toast.success("下单成功");
+        this.$Notify({ type: 'success', message: '下单成功' });
       });
     },
 

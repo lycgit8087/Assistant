@@ -12,7 +12,11 @@ import Loading from './components/loading.js'
 
 
 import store from "./store"
-import { Toast, Notify, Dialog} from "vant";
+import {
+  Toast,
+  Notify,
+  Dialog
+} from "vant";
 import Vconsole from 'vconsole'
 let vConsole = new Vconsole()
 Vue.use(vConsole)
@@ -24,19 +28,13 @@ Vue.config.productionTip = false
 Vue.prototype.$Toast = Toast
 Vue.prototype.$Notify = Notify
 Vue.prototype.$Dialog = Dialog
-  
-
-
-
-
-
 /* eslint-disable no-new */
-=new Vue({
+new Vue({
   el: '#app',
   router,
   store,
-  components: { App },
+  components: {
+    App
+  },
   template: '<App/>'
 })
-
-

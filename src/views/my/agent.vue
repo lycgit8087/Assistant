@@ -119,7 +119,7 @@ export default {
           ltag: ltag,
         })
         .then((res) => {
-          this.$Toast.success("编辑成功");
+          this.$Notify({ type: 'success', message: '编辑成功' });
           this.getDetail();
           this.closePopup();
         });
@@ -145,7 +145,7 @@ export default {
           aid: aid,
         })
         .then((res) => {
-          this.$Toast.success("添加成功");
+          this.$Notify({ type: 'success', message: '添加成功' });
           this.getDetail();
           this.closePopup();
         });
@@ -164,7 +164,7 @@ export default {
               ltag: ltag,
             })
             .then((res) => {
-            this.$Toast.success("删除成功");
+            this.$Notify({ type: 'success', message: '删除成功' });
             this.list=list.filter(item=>item.ltag!=ltag)
             this.closePopup();
 

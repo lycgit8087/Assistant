@@ -1,5 +1,6 @@
 // loadgin.vue
 <template>
+<div class="loading-view" >
   <van-popup
     :close-on-click-overlay="false"
     v-model="show"
@@ -8,6 +9,7 @@
       <van-loading color="#1989fa" v-if="show" type="circular" />
     </div>
   </van-popup>
+  </div>
 </template>
 
 <script>
@@ -26,7 +28,7 @@ export default {
     .van-overlay{
         background-color:transparent
     }
-    .van-popup{
+  .loading-view  .van-popup{
         background-color:transparent
 
     }
