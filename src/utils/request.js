@@ -2,14 +2,16 @@ import axios from 'axios';
 import { Toast,Notify  } from 'vant';
 import api from '../api'
 import qs from 'qs'
-import router from '../router'
+import Vue from 'vue';
+let vm = new Vue();
+// console.log(vm.$loading)
+
 let requestCount = 0;
 let loadingInstance = null
 let timer;
 const root = process.env.API_ROOT;
 axios.defaults.retry = 4;
 axios.defaults.retryDelay = 1000;
-
 const codeMessage = {
   400: '发出的请求有错误，服务器没有进行新建或修改数据的操作。',
   401: '用户没有权限（令牌、用户名、密码错误）。',
@@ -50,11 +52,12 @@ axios.interceptors.request.use(
   config => {
     // console.log(config.headers.action)
     if(config.headers.action!="token_get"&&requestCount === 0&&config.headers.action!="qrcode_get"){
-        loadingInstance=  Toast.loading({
-            message: '加载中...',
-            forbidClick: true,
-            duration:0
-          })
+        // loadingInstance=  Toast.loading({
+        //     message: '加载中...',
+        //     forbidClick: true,
+        //     duration:0
+        //   })
+          vm.$loading.show()
     }
     requestCount++
     const token = localStorage.getItem("token");
@@ -99,10 +102,11 @@ function tryHideLoading() {
   //采用setTimeout是为了解决一个请求结束后紧接着有另一请求发起导致loading闪烁的问题
   timer = setTimeout(() => {    
     if (requestCount === 0) {
-      if(loadingInstance){
-        loadingInstance.clear()
-        clearTimeout(timer)
-      }
+      vm.$loading.hide()
+      // if(loadingInstance){
+      //   loadingInstance.clear()
+      //   clearTimeout(timer)
+      // }
      
     }
   })

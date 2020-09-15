@@ -8,11 +8,15 @@ import 'vant/lib/index.css';
 import 'amfe-flexible/index.js'
 import api from './api'
 import util from './utils/util.js'
+import Loading from './components/loading.js'
+
 
 import store from "./store"
 import { Toast, Notify, Dialog} from "vant";
 import Vconsole from 'vconsole'
-
+let vConsole = new Vconsole()
+Vue.use(vConsole)
+Vue.use(Loading)
 Vue.use(Vant);
 Vue.prototype.$api = api
 Vue.prototype.$util = util
@@ -20,19 +24,19 @@ Vue.config.productionTip = false
 Vue.prototype.$Toast = Toast
 Vue.prototype.$Notify = Notify
 Vue.prototype.$Dialog = Dialog
-// if(process.env.NODE_ENV != "development"){
-  let vConsole = new Vconsole()
-  Vue.use(vConsole)
-// }
+  
+
 
 
 
 
 /* eslint-disable no-new */
-new Vue({
+=new Vue({
   el: '#app',
   router,
   store,
   components: { App },
   template: '<App/>'
 })
+
+

@@ -1,18 +1,46 @@
 <template>
   <div class="Order">
     <!-- :sticky="true" :offset-top="45" -->
-    <van-nav-bar title="订单" :fixed="true" placeholder right-text="导出" @click-right="rightClick"></van-nav-bar>
+    <van-nav-bar
+      title="订单"
+      :fixed="true"
+      placeholder
+      right-text="导出"
+      @click-right="rightClick"
+    ></van-nav-bar>
 
     <van-tabs v-model="active" @change="changeActive">
-      <van-tab v-for="(item,index) in tabList" :key="index" :title="item.title" :info="item.info">
+      <van-tab
+        v-for="(item, index) in tabList"
+        :key="index"
+        :title="item.title"
+        :info="item.info"
+      >
         <div class="tabListChild">
           <div class="tabListChildEdit">
-            <van-search v-model="keyword" class="listsearch" placeholder="请输入搜索关键词" />
-            <p v-if="identity!=0" class="tabListChildFiler" @click="peopleToggle(0)">
+            <van-search
+              v-model="keyword"
+              class="listsearch"
+              placeholder="请输入搜索关键词"
+            />
+            <p
+              v-if="identity != 0"
+              class="tabListChildFiler"
+              @click="peopleToggle(0)"
+            >
               <span>筛选</span>
-              <van-icon name="filter-o" :color="isFilter?'#FFA726':'#323233'" />
+              <van-icon
+                name="filter-o"
+                :color="isFilter ? '#FFA726' : '#323233'"
+              />
             </p>
-            <van-button v-if="identity!=0" type="info" size="small" @click="popupToggle">批量操作</van-button>
+            <van-button
+              v-if="identity != 0"
+              type="info"
+              size="small"
+              @click="popupToggle"
+              >批量操作</van-button
+            >
           </div>
           <van-pull-refresh
             class="refresh-class"
@@ -25,30 +53,32 @@
               :finished="item.finished"
               finished-text="没有更多了"
               @load="onLoad"
-              v-if="item.listData.length!=0"
+              v-if="item.listData.length != 0"
               class="vlist"
             >
               <div class="listParent">
                 <div
                   class="listChild"
                   @click="to_detail(litem.orderid)"
-                  v-for="(litem,index) in item.listData"
+                  v-for="(litem, index) in item.listData"
                   :key="index"
                 >
                   <div class="listChildTop">
-                    <p>{{litem.goods}}</p>
-                    <span :style="'color:'+litem.colorText">{{litem.status_text}}</span>
+                    <p>{{ litem.goods }}</p>
+                    <span :style="'color:' + litem.colorText">{{
+                      litem.status_text
+                    }}</span>
                   </div>
                   <div class="listChildTime">
-                    <p>下单时间：{{litem.time}}</p>
+                    <p>下单时间：{{ litem.time }}</p>
                   </div>
                   <div class="listChildDes">
                     <div class="listChildDesLeft">
                       <p v-if="litem.uname">
                         <van-icon :name="litem.uavatar" />
-                        <span>{{litem.uname}}</span>
+                        <span>{{ litem.uname }}</span>
                       </p>
-                      <span>{{litem.name}}的订单</span>
+                      <span>{{ litem.name }}的订单</span>
                     </div>
                     <div class="listChildDesRight"></div>
                   </div>
@@ -56,7 +86,10 @@
               </div>
             </van-list>
 
-            <van-empty v-if="!isloading&&item.listData.length==0" description="暂无数据" />
+            <van-empty
+              v-if="!isloading && item.listData.length == 0"
+              description="暂无数据"
+            />
           </van-pull-refresh>
         </div>
       </van-tab>
@@ -69,24 +102,31 @@
         <span class="popupView_title">批量操作订单</span>
 
         <div class="checkall">
-          <van-button round type="info" size="mini" @click="checkAll">{{isCheckAll?'反选':'全选'}}</van-button>
-          <p>已选择{{checkOrder}}个订单</p>
+          <van-button round type="info" size="mini" @click="checkAll">{{
+            isCheckAll ? "反选" : "全选"
+          }}</van-button>
+          <p>已选择{{ checkOrder }}个订单</p>
         </div>
-        <div class="popuplistView" v-if="decidedList.length!=0">
+        <div class="popuplistView" v-if="decidedList.length != 0">
           <van-list>
             <div
               class="popupView_child"
-              v-for="(item,index) in decidedList"
+              v-for="(item, index) in decidedList"
               @click="checkSureOrder(index)"
               :key="index"
             >
               <div class="listChildTop">
-                <p>{{item.goods}}</p>
+                <p>{{ item.goods }}</p>
                 <span style="color:#E96960">待确认</span>
               </div>
               <div class="listChildTime">
-                <p>下单时间：{{item.time}}</p>
-                <van-icon v-if="item.is_sure" name="checked" color="#E96960" size="20" />
+                <p>下单时间：{{ item.time }}</p>
+                <van-icon
+                  v-if="item.is_sure"
+                  name="checked"
+                  color="#E96960"
+                  size="20"
+                />
 
                 <van-icon v-else name="passed" size="20" />
               </div>
@@ -97,9 +137,13 @@
         <van-empty v-else description="暂无待确定订单" />
 
         <!-- 底部操作按钮 -->
-        <div class="popupfooter" v-if="decidedList.length!=0">
-          <van-button type="info" class="sureclass" @click="peopleToggle(1)">确定</van-button>
-          <van-button type="danger" class="deleclass" @click="delOrder">删除</van-button>
+        <div class="popupfooter" v-if="decidedList.length != 0">
+          <van-button type="info" class="sureclass" @click="peopleToggle(1)"
+            >确定</van-button
+          >
+          <van-button type="danger" class="deleclass" @click="delOrder"
+            >删除</van-button
+          >
         </div>
       </div>
     </van-popup>
@@ -107,28 +151,43 @@
     <!--  选择供应商-->
     <van-popup v-model="peopleShow" position="bottom" closeable>
       <div class="pview">
-        <p class="pview_title">{{btnType==1?'请选择供应商':'请选择代理商'}}</p>
+        <p class="pview_title">
+          {{ btnType == 1 ? "请选择供应商" : "请选择代理商" }}
+        </p>
         <!-- 搜索按钮 -->
-        <van-search class="poeple_search" v-model="peoplesearch" placeholder="请输入搜索关键词" />
+        <van-search
+          class="poeple_search"
+          v-model="peoplesearch"
+          placeholder="请输入搜索关键词"
+        />
         <div class="allpeople">
-          <div class="allpeoplechild" v-for="(item,index) in peopleList" :key="index">
+          <div
+            class="allpeoplechild"
+            v-for="(item, index) in peopleList"
+            :key="index"
+          >
             <van-image fit="cover" :src="item.avatar" />
             <div class="allpeoplechild_right">
               <p class="allpeoplechild_right_des">
-                <span>{{item.name}}</span>
-                <span>{{item.mobile}}</span>
+                <span>{{ item.name }}</span>
+                <span>{{ item.mobile }}</span>
               </p>
               <!-- 下单链接 -->
               <van-cell-group>
                 <van-cell
                   :title="litem.name"
-                  v-for="(litem,lindex) in item.link_data"
+                  v-for="(litem, lindex) in item.link_data"
                   :key="lindex"
-                  @click="agentCheck(index,lindex)"
+                  @click="agentCheck(index, lindex)"
                 >
                   <template #right-icon>
                     <div class="iconview">
-                      <van-icon v-if="litem.isCheck" name="checked" color="#E96960" size="20" />
+                      <van-icon
+                        v-if="litem.isCheck"
+                        name="checked"
+                        color="#E96960"
+                        size="20"
+                      />
 
                       <van-icon v-else name="passed" size="20" />
                     </div>
@@ -138,20 +197,27 @@
             </div>
           </div>
 
-          <van-button v-if="peopleList.length!=0" type="info" @click="sureAgentCheck">确定</van-button>
+          <van-button
+            v-if="peopleList.length != 0"
+            type="info"
+            @click="sureAgentCheck"
+            >确定</van-button
+          >
         </div>
       </div>
     </van-popup>
 
     <!-- 右侧固定按钮 -->
 
-    <div class="fix-right" v-if="bthArr.length!=1">
+    <div class="fix-right" v-if="bthArr.length != 1">
       <div class="fix-right-child">
         <div
-          :class="[item.cls,index==btnNum?'active-bth':'']"
-          v-for="(item,index) in bthArr"
-          @click="checkBtn(item.type,index)"
-        >{{item.text}}</div>
+          :class="[item.cls, index == btnNum ? 'active-bth' : '']"
+          v-for="(item, index) in bthArr"
+          @click="checkBtn(item.type, index)"
+        >
+          {{ item.text }}
+        </div>
       </div>
     </div>
 
@@ -166,21 +232,24 @@
           <div class="export-child-btn">
             <van-button
               @click="userBtnClick(index)"
-              v-for="(item,index) in userTypeArr"
+              v-for="(item, index) in userTypeArr"
               :key="index"
-              :type="userTypeIndex==index?'info':'default'"
-            >{{item.text}}</van-button>
+              :type="userTypeIndex == index ? 'info' : 'default'"
+              >{{ item.text }}</van-button
+            >
           </div>
         </div>
         <!-- 选择时间 -->
         <div class="export-child">
           <span>时间区间</span>
-          <div class="time-view" @click="timeShow = true" >
-              <van-button round size="small">{{date.length==0?'开始时间':dateTimeObj.start}}</van-button>
-              <span class="longspan" ></span>
-              <van-button round size="small">{{date.length==0?'结束时间':dateTimeObj.end}}</van-button>
-
-
+          <div class="time-view" @click="timeShow = true">
+            <van-button round size="small">{{
+              date.length == 0 ? "开始时间" : dateTimeObj.start
+            }}</van-button>
+            <span class="longspan"></span>
+            <van-button round size="small">{{
+              date.length == 0 ? "结束时间" : dateTimeObj.end
+            }}</van-button>
           </div>
         </div>
 
@@ -190,19 +259,28 @@
           <div class="export-child-btn">
             <van-button
               @click="orderTypeClick(index)"
-              v-for="(item,index) in orderTypeArr"
+              v-for="(item, index) in orderTypeArr"
               :key="index"
-              :type="item.isCheck?'info':'default'"
-            >{{item.text}}</van-button>
+              :type="item.isCheck ? 'info' : 'default'"
+              >{{ item.text }}</van-button
+            >
           </div>
         </div>
 
-
-        <van-button class="order-btn" type="info" @click="orderExport" >导出订单</van-button>
+        <van-button class="order-btn" type="info" @click="orderExport"
+          >导出订单</van-button
+        >
       </div>
     </van-popup>
 
-    <van-calendar v-model="timeShow" :show-subtitle="false" :min-date="minDate" :max-date="maxDate" type="range" @confirm="onConfirm" />
+    <van-calendar
+      v-model="timeShow"
+      :show-subtitle="false"
+      :min-date="minDate"
+      :max-date="maxDate"
+      type="range"
+      @confirm="onConfirm"
+    />
   </div>
 </template>
 
@@ -310,11 +388,12 @@ export default {
         { text: "已发货", isCheck: false, type: "1" },
         { text: "已签收", isCheck: false, type: "2" },
       ],
-      dateTimeObj:{},
-      filterNum:0,//0 筛选 1 确认订单
+      dateTimeObj: {},
+      filterNum: 0, //0 筛选 1 确认订单
     };
   },
   created() {
+    // this.$loading.show();
     if (JSON.stringify(this.$store.state.userInfo) != "{}") {
       console.log(this.$store.state.userInfo);
       let { identity } = this.$store.state.userInfo;
@@ -360,23 +439,26 @@ export default {
     },
 
     formatDate(date) {
-      return `${date.getFullYear()-1}/${date.getMonth() + 1}/${date.getDate()}`;
+      return `${date.getFullYear() - 1}/${date.getMonth() +
+        1}/${date.getDate()}`;
     },
 
     onConfirm(date) {
       let [start, end] = date;
       this.timeShow = false;
       this.date = `${this.formatDate(start)} - ${this.formatDate(end)}`;
-      this.dateTimeObj={
-        start:this.formatDate(start),
-        end:this.formatDate(end)
-      }
+      this.dateTimeObj = {
+        start: this.formatDate(start),
+        end: this.formatDate(end),
+      };
     },
     // 设置右侧显示的状态
     setBtnData(identity) {
       let { btnNum, bthArr, btnType } = this;
       bthArr =
-        identity == 3 ? bthArr : bthArr.filter((item) => item.type == identity||item.type ==0);
+        identity == 3
+          ? bthArr
+          : bthArr.filter((item) => item.type == identity || item.type == 0);
       btnNum =
         identity == 3 ? 2 : bthArr.findIndex((item) => item.type == identity);
       btnType = identity == 3 ? 2 : bthArr[identity].type;
@@ -387,9 +469,9 @@ export default {
     },
 
     rightClick() {
-      let{btnType,userTypeIndex}=this
-      userTypeIndex=btnType==3||btnType==2?1:0
-      this.userTypeIndex=userTypeIndex
+      let { btnType, userTypeIndex } = this;
+      userTypeIndex = btnType == 3 || btnType == 2 ? 1 : 0;
+      this.userTypeIndex = userTypeIndex;
       this.rightShow = true;
     },
     // 订单状态选择
@@ -433,9 +515,9 @@ export default {
 
     //筛选
     peopleToggle(index) {
-      let { btnType,decidedList } = this;
+      let { btnType, decidedList } = this;
       let orderArr = decidedList.filter((item) => item.is_sure == true);
-      if (orderArr.length == 0&&index==1) {
+      if (orderArr.length == 0 && index == 1) {
         this.$Toast("请选择待确定订单");
         return;
       }
@@ -444,7 +526,7 @@ export default {
       } else {
         this.getAgentDetail();
       }
-      this.filterNum=index
+      this.filterNum = index;
       this.peopleShow = !this.peopleShow;
     },
 
@@ -506,77 +588,82 @@ export default {
     },
     // 选择代理商或供应商
     agentCheck(index, lindex) {
-      let { peopleList,filterNum } = this;
-      console.log(filterNum)
-      if(filterNum==0){
-         this.peopleList[index].link_data[lindex].isCheck = !peopleList[index]
-        .link_data[lindex].isCheck;
-      }else{
-        peopleList.forEach((item,index)=>{
-          item.link_data.forEach(fitem=>{
-            fitem.isCheck=false
-          })
-        })
-        peopleList[index].link_data[lindex].isCheck=!peopleList[index]
-        .link_data[lindex].isCheck
-        this.peopleList=peopleList
+      let { peopleList, filterNum } = this;
+      console.log(filterNum);
+      if (filterNum == 0) {
+        this.peopleList[index].link_data[lindex].isCheck = !peopleList[index]
+          .link_data[lindex].isCheck;
+      } else {
+        peopleList.forEach((item, index) => {
+          item.link_data.forEach((fitem) => {
+            fitem.isCheck = false;
+          });
+        });
+        peopleList[index].link_data[lindex].isCheck = !peopleList[index]
+          .link_data[lindex].isCheck;
+        this.peopleList = peopleList;
       }
-     
     },
     // 导出订单
-    
-    orderExport(){
-      let {userTypeArr,orderTypeArr,userTypeIndex,dateTimeObj,date}=this
-     
-      let orderIdArr=[]
-      orderTypeArr.forEach(item=>{
-        if(item.isCheck){
-          orderIdArr.push(item.type)
-        }
-      })
-       if(date.length==0){
-        this.$Toast("请选择起止时间")
-        return
-      }
-      if(orderIdArr.length==0){
-        this.$Toast("请选择要导出的订单类型")
-        return
-      }
-      this.$api.order.orderExport({
-        utype:userTypeArr[userTypeIndex].type,
-        status:orderIdArr.join(","),
-        start_time:dateTimeObj.start,
-        end_time:dateTimeObj.end
-      }).then(res=>{
-        console.log(res.data)
-        var a = document.createElement('a');
-            a.target = "_self";
-            a.href =res.data ;
-            a.click();
-      })
 
+    orderExport() {
+      let {
+        userTypeArr,
+        orderTypeArr,
+        userTypeIndex,
+        dateTimeObj,
+        date,
+      } = this;
+
+      let orderIdArr = [];
+      orderTypeArr.forEach((item) => {
+        if (item.isCheck) {
+          orderIdArr.push(item.type);
+        }
+      });
+      if (date.length == 0) {
+        this.$Toast("请选择起止时间");
+        return;
+      }
+      if (orderIdArr.length == 0) {
+        this.$Toast("请选择要导出的订单类型");
+        return;
+      }
+      this.$api.order
+        .orderExport({
+          utype: userTypeArr[userTypeIndex].type,
+          status: orderIdArr.join(","),
+          start_time: dateTimeObj.start,
+          end_time: dateTimeObj.end,
+        })
+        .then((res) => {
+          console.log(res.data);
+          var a = document.createElement("a");
+          a.target = "_self";
+          a.href = res.data;
+          a.click();
+        });
     },
 
     // 确定选择代理商或供应商
     sureAgentCheck() {
-      let { peopleList ,filterNum} = this;
+      let { peopleList, filterNum } = this;
       let { ltagArr } = this;
-      if(filterNum==0){
-         ltagArr = [];
-      peopleList.forEach((item) => {
-        item.link_data.forEach((litem) => {
-          if (litem.isCheck) {
-            ltagArr.push(litem.ltag);
-          }
+      if (filterNum == 0) {
+        ltagArr = [];
+        peopleList.forEach((item) => {
+          item.link_data.forEach((litem) => {
+            if (litem.isCheck) {
+              ltagArr.push(litem.ltag);
+            }
+          });
         });
-      });
-      this.ltagArr = ltagArr;
-      this.peopleShow = false;
-      this.getList();
-      }else{
-        this.setSure()
+        this.ltagArr = ltagArr;
+        this.peopleShow = false;
+        this.getList();
+      } else {
+        this.setSure();
       }
-     
     },
 
     // 订单列表
@@ -664,28 +751,30 @@ export default {
 
     //确认订单
     setSure() {
-      let { decidedList,peopleList } = this;
+      let { decidedList, peopleList } = this;
       let orderArr = decidedList.filter((item) => item.is_sure == true);
       let orderId = orderArr.map((item) => item.orderid);
-      let ltag=[]
-        peopleList.forEach(item=>{
-          item.link_data.forEach(litem=>{
-            if(litem.isCheck){
-              ltag.push(litem.ltag)
-            }
-          })
-        })
+      let ltag = [];
+      peopleList.forEach((item) => {
+        item.link_data.forEach((litem) => {
+          if (litem.isCheck) {
+            ltag.push(litem.ltag);
+          }
+        });
+      });
       this.$api.order
         .edit({
           type: 1,
           orderid: orderId.join(","),
-          ltag:ltag.join(",")
+          ltag: ltag.join(","),
         })
         .then((res) => {
           this.$Toast.success("已确认");
           this.decidedPageNum = 1;
-          this.peopleShow=false
-          this.decidedList=decidedList.filter(item=>item.is_sure==false)
+          this.peopleShow = false;
+          this.decidedList = decidedList.filter(
+            (item) => item.is_sure == false
+          );
           this.getSureList();
         });
     },
@@ -739,7 +828,7 @@ export default {
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style  >
+<style>
 .tabListChild {
   display: flex;
   align-items: center;
@@ -959,7 +1048,7 @@ export default {
   justify-content: space-around;
   width: 100%;
 }
-.longspan{
+.longspan {
   display: flex;
   width: 30px;
   height: 2px;
@@ -1082,11 +1171,11 @@ export default {
   margin-right: 10px;
   margin-bottom: 10px;
 }
-.order-btn{
+.order-btn {
   width: 193px;
   margin-top: 200px;
 }
-.time-view{
+.time-view {
   display: flex;
   align-items: center;
 }
