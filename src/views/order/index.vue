@@ -214,6 +214,7 @@
         <div
           :class="[item.cls, index == btnNum ? 'active-bth' : '']"
           v-for="(item, index) in bthArr"
+          :key="index"
           @click="checkBtn(item.type, index)"
         >
           {{ item.text }}
